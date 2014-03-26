@@ -37,4 +37,9 @@ abstract class Entity {
 		}, $string);
 	}
 
+	public function __toString()
+	{
+		return json_encode($this->attributes);
+	}
+
 }

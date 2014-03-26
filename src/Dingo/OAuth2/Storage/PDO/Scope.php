@@ -18,14 +18,14 @@ class Scope implements ScopeInterface {
 
 	public function get($scope)
 	{
-		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s WHERE %1$s.id = :scope', $this->tables['scopes']));
+		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s WHERE %1$s.scope = :scope', $this->tables['scopes']));
 
 		if ( ! $query->execute([':scope' => $scope]) or ! $scope = $query->fetch())
 		{
 			return false;
 		}
 
-		return new ScopeEntity($scope['id'], $scope['name'], $scope['description']);
+		return new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
 	}
 
 }

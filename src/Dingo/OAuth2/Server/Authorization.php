@@ -13,6 +13,10 @@ class Authorization {
 
 	protected $scopeValidator;
 
+	protected $accessTokenExpiration = 3600;
+
+	protected $refreshTokenExpiration = 3600;
+
 	protected $grants = [];
 
 	public function __construct(Adapter $storage, Request $request = null)
@@ -40,7 +44,7 @@ class Authorization {
 		return $this;
 	}
 
-	public function createToken()
+	public function issueToken()
 	{
 		if ( ! $this->request->isMethod('post'))
 		{
@@ -57,7 +61,16 @@ class Authorization {
 			throw new \Exception('unsupported_grant_type');
 		}
 
-		return $this->grants[$grant]->execute();
+		$grant = $this->grants[$grant];
+
+		$token = $grant->setTokenExpiration($this->accessTokenExpiration)->execute();
+
+		if (isset($this->grants['refresh']))
+		{
+			// TODO: Implement the addition of a refresh token.
+		}
+
+		return $token;
 	}
 
 	public function getStorage()
@@ -87,5 +100,18 @@ class Authorization {
 		return $this;
 	}
 
+	public function setAccessTokenExpiration($expires = 3600)
+	{
+		$this->accessTokenExpiration = $expires;
+
+		return $this;
+	}
+
+	public function setRefreshTokenExpiration($expires = 3600)
+	{
+		$this->refreshTokenExpiration = $expires;
+
+		return $this;
+	}
 
 }

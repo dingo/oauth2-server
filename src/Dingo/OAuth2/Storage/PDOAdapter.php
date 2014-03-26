@@ -2,6 +2,7 @@
 
 use PDO;
 use Dingo\OAuth2\Storage\PDO\Scope;
+use Dingo\OAuth2\Storage\PDO\Token;
 use Dingo\OAuth2\Storage\PDO\Client;
 
 class PdoAdapter extends Adapter {
@@ -9,14 +10,13 @@ class PdoAdapter extends Adapter {
 	protected $connection;
 
 	protected $tables = [
-		'clients'             => 'oauth_clients',
-		'client_endpoints'    => 'oauth_client_endpoints',
-		'tokens'              => 'oauth_tokens',
-		'token_scopes'        => 'oauth_token_scopes',
-		'authorization_code'  => 'oauth_authorization_codes',
-		'session'             => 'oauth_sessions',
-		'session_scopes'      => 'oauth_session_scopes',
-		'scopes'              => 'oauth_scopes'
+		'clients'                   => 'oauth_clients',
+		'client_endpoints'          => 'oauth_client_endpoints',
+		'tokens'                    => 'oauth_tokens',
+		'token_scopes'              => 'oauth_token_scopes',
+		'authorization_code'        => 'oauth_authorization_codes',
+		'authorization_code_scopes' => 'oauth_authorization_code_scopes',
+		'scopes'                    => 'oauth_scopes'
 	];
 
 	public function __construct(PDO $connection, array $tables = [])
@@ -30,22 +30,12 @@ class PdoAdapter extends Adapter {
 		return new Client($this->connection, $this->tables);
 	}
 
-	public function createAccessTokenStorage()
+	public function createTokenStorage()
 	{
-
-	}
-	
-	public function createRefreshTokenStorage()
-	{
-
+		return new Token($this->connection, $this->tables);
 	}
 
 	public function createAuthorizationCodeStorage()
-	{
-
-	}
-
-	public function createSessionStorage()
 	{
 
 	}

@@ -1,7 +1,9 @@
 <?php namespace Dingo\OAuth2\Grant;
 
+use Dingo\OAuth2\Token;
 use Dingo\OAuth2\ScopeValidator;
 use Dingo\OAuth2\Storage\Adapter;
+use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class Grant implements GrantInterface {
@@ -11,6 +13,8 @@ abstract class Grant implements GrantInterface {
 	protected $request;
 
 	protected $scopeValidator;
+
+	protected $tokenExpiration;
 
 	protected function validateConfidentialClient()
 	{
@@ -52,6 +56,21 @@ abstract class Grant implements GrantInterface {
 		return $this->scopeValidator->validate();
 	}
 
+	protected function generateToken()
+	{
+		return Token::make();
+	}
+
+	protected function response(TokenEntity $token)
+	{
+		return [
+			'access_token' => $token->getToken(),
+			'token_type'   => 'Bearer',
+			'expires'      => $token->getExpires(),
+			'expires_in'   => $this->getTokenExpiration()
+		];
+	}
+
 	public function setStorage(Adapter $storage)
 	{
 		$this->storage = $storage;
@@ -69,6 +88,20 @@ abstract class Grant implements GrantInterface {
 	public function setScopeValidator(ScopeValidator $scopeValidator)
 	{
 		$this->scopeValidator = $scopeValidator;
+
+		return $this;
+	}
+
+	public function setTokenExpiration($expires)
+	{
+		$this->tokenExpiration = $expires;
+
+		return $this;
+	}
+
+	public function getTokenExpiration()
+	{
+		return $this->tokenExpiration;
 	}
 
 }

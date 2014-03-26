@@ -2,9 +2,9 @@
 
 class Scope extends Entity {
 
-	public function __construct($id, $name = null, $description = null)
+	public function __construct($scope, $name = null, $description = null)
 	{
-		$this->id = $id;
+		$this->scope = $scope;
 		$this->name = $name;
 		$this->description = $description;
 	}

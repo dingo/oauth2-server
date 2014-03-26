@@ -48,7 +48,7 @@ class ScopeValidator {
 				throw new \Exception('invalid_scope');
 			}
 
-			$scopes[$scope->getId()] = $scope;
+			$scopes[$scope->getScope()] = $scope;
 		}
 
 		return $scopes;

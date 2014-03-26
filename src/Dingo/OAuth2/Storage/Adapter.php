@@ -8,13 +8,9 @@ abstract class Adapter {
 
 	abstract public function createClientStorage();
 
-	abstract public function createAccessTokenStorage();
+	abstract public function createTokenStorage();
 	
-	abstract public function createRefreshTokenStorage();
-
 	abstract public function createAuthorizationCodeStorage();
-
-	abstract public function createSessionStorage();
 
 	abstract public function createScopeStorage();
 
