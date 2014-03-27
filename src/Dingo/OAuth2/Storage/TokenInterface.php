@@ -21,4 +21,24 @@ interface TokenInterface {
 	 */
 	public function create($token, $type, $clientId, $userId, $expires);
 
+	/**
+	 * Get an access token from storage. The expires time MUST be returned as
+	 * a UNIX timestamp. This method should also retrieve the associated
+	 * scopes of the token and attach them to the token entity.
+	 * 
+	 * Example MySQL query:
+	 * 
+	 * SELECT * FROM oauth_tokens WHERE token = :token
+	 * 
+	 * Example MySQL query to fetch associated scopes:
+	 * 
+	 * SELECT oauth_scopes.* FROM oauth_scopes
+	 * LEFT JOIN oauth_token_scopes ON oauth_scopes.scope = oauth_token_scopes.scope
+	 * WHERE oauth_token_scopes.token = :token
+	 * 
+	 * @param  string  $token
+	 * @return \Dingo\OAuth2\Entity\Token|bool
+	 */
+	public function get($token);
+
 }

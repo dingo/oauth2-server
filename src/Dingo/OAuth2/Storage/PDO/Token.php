@@ -2,6 +2,7 @@
 
 use Dingo\OAuth2\Storage\TokenInterface;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
+use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
 class Token extends PDO implements TokenInterface {
 
@@ -47,6 +48,45 @@ class Token extends PDO implements TokenInterface {
 
 			$query->execute([':token' => $token, ':scope' => $scope->getScope()]);
 		}
+	}
+
+	/**
+	 * Get an access token from storage.
+	 * 
+	 * @param  string  $token
+	 * @return \Dingo\OAuth2\Entity\Token|bool
+	 */
+	public function get($token)
+	{
+		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s
+			WHERE token = :token', $this->tables['tokens']));
+
+		if ( ! $query->execute([':token' => $token]) or ! $token = $query->fetch())
+		{
+			return false;
+		}
+
+		$token = new TokenEntity($token['token'], $token['type'], $token['client_id'], $token['user_id'], strtotime($token['expires']));
+
+		// Now that the token has been fetched and the entity created we'll also fetch
+		// the associated scopes of the token.
+		$query = $this->connection->prepare(sprintf('SELECT %1$s.* FROM %1$s
+			LEFT JOIN %2$s ON %1$s.scope = %2$s.scope
+			WHERE %2$s.token = :token', $this->tables['scopes'], $this->tables['token_scopes']));
+
+		if ($query->execute([':token' => $token->getToken()]))
+		{
+			$scopes = [];
+
+			foreach ($query->fetchAll() as $scope)
+			{
+				$scopes[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
+			}
+
+			$token->attachScopes($scopes);
+		}
+
+		return $token;
 	}
 
 }
