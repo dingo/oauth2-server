@@ -7,24 +7,68 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Authorization {
 
+	/**
+	 * Storage adapter instance.
+	 * 
+	 * @var \Dingo\OAuth2\Storage\Adapter
+	 */
 	protected $storage;
 
+	/**
+	 * Symfony request instance.
+	 * 
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
 	protected $request;
 
+	/**
+	 * Scope validator instance.
+	 * 
+	 * @var \Dingo\OAuth2\ScopeValidator
+	 */
 	protected $scopeValidator;
 
+	/**
+	 * Access token expiration in seconds.
+	 * 
+	 * @var int
+	 */
 	protected $accessTokenExpiration = 3600;
 
+	/**
+	 * Refresh token expiration in seconds.
+	 * 
+	 * @var int
+	 */
 	protected $refreshTokenExpiration = 3600;
 
+	/**
+	 * Array of registered grants.
+	 * 
+	 * @var array
+	 */
 	protected $grants = [];
 
+	/**
+	 * Create a new Dingo\OAuth2\Server\Authorization instance.
+	 * 
+	 * @param  \Dingo\OAuth2\Storage\Adapter  $storage
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return void
+	 */
 	public function __construct(Adapter $storage, Request $request = null)
 	{
 		$this->storage = $storage;
 		$this->request = $request ?: Request::createFromGlobals();
 	}
 
+	/**
+	 * Register a grant with the server so that tokens can be issued
+	 * with that particular grant.
+	 * 
+	 * @param  \Dingo\OAuth2\Grant\GrantInterface  $grant
+	 * @return \Dingo\OAuth2\Server\Authorization
+	 */
 	public function registerGrant(GrantInterface $grant)
 	{
 		$key = $grant->getGrantIdentifier();
@@ -44,6 +88,14 @@ class Authorization {
 		return $this;
 	}
 
+	/**
+	 * Issue an access token and (if requested and applicable) a refresh token.
+	 * Returns an array containing the access token, the type of token, the
+	 * expiration time and the number of seconds until the token expires.
+	 * If applicable and enabled, a refresh token will also be included.
+	 * 
+	 * @return array
+	 */
 	public function issueToken()
 	{
 		if ( ! $this->request->isMethod('post'))
@@ -73,16 +125,32 @@ class Authorization {
 		return $token;
 	}
 
+	/**
+	 * Get the storage adapter instance.
+	 * 
+	 * @return \Dingo\OAuth2\Storage\Adapter
+	 */
 	public function getStorage()
 	{
 		return $this->storage;
 	}
 
+	/**
+	 * Get the symfony request instance.
+	 * 
+	 * @return \Symfony\Component\HttpFoundation\Request
+	 */
 	public function getRequest()
 	{
 		return $this->request;
 	}
 
+	/**
+	 * Get the scope validator instance. If not defined a new instance
+	 * will be instantiated.
+	 * 
+	 * @return \Dingo\OAuth2\ScopeValidator
+	 */
 	public function getScopeValidator()
 	{
 		if ( ! isset($this->scopeValidator))
@@ -93,6 +161,12 @@ class Authorization {
 		return $this->scopeValidator;
 	}
 
+	/**
+	 * Set the scope validator instance.
+	 * 
+	 * @param  \Dingo\OAuth2\ScopeValidator
+	 * @return \Dingo\OAuth2\Server\Authorization
+	 */
 	public function setScopeValidator(ScopeValidator $scopeValidator)
 	{
 		$this->scopeValidator = $scopeValidator;
@@ -100,6 +174,12 @@ class Authorization {
 		return $this;
 	}
 
+	/**
+	 * Set the access token expiration time in seconds.
+	 * 
+	 * @param  int  $expires
+	 * @return \Dingo\OAuth2\Server\Authorization
+	 */
 	public function setAccessTokenExpiration($expires = 3600)
 	{
 		$this->accessTokenExpiration = $expires;
@@ -107,6 +187,12 @@ class Authorization {
 		return $this;
 	}
 
+	/**
+	 * Set the refresh token expiration time in seconds.
+	 * 
+	 * @param  int  $expires
+	 * @return \Dingo\OAuth2\Server\Authorization
+	 */
 	public function setRefreshTokenExpiration($expires = 3600)
 	{
 		$this->refreshTokenExpiration = $expires;

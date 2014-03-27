@@ -1,21 +1,18 @@
 <?php namespace Dingo\OAuth2\Storage\PDO;
 
-use PDO;
 use Dingo\OAuth2\Storage\ClientInterface;
 use Dingo\OAuth2\Entity\Client as ClientEntity;
 
 class Client implements ClientInterface {
 
-	protected $connection;
-
-	protected $tables;
-
-	public function __construct(PDO $connection, array $tables)
-	{
-		$this->connection = $connection;
-		$this->tables = $tables;
-	}
-
+	/**
+	 * Get a client from storage.
+	 * 
+	 * @param  string  $id
+	 * @param  string  $secret
+	 * @param  string  $redirectUri
+	 * @return \Dingo\OAuth2\Entity\Client|false
+	 */
 	public function get($id, $secret = null, $redirectUri = null)
 	{
 		// Prepare the default bindings that will be used for a fully constructed

@@ -6,16 +6,12 @@ use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
 class Scope implements ScopeInterface {
 
-	protected $connection;
-
-	protected $tables;
-
-	public function __construct(PDO $connection, array $tables)
-	{
-		$this->connection = $connection;
-		$this->tables = $tables;
-	}
-
+	/**
+	 * Get a scope from storage.
+	 * 
+	 * @param  string  $scope
+	 * @return \Dingo\OAuth2\Entity\Scope|false
+	 */
 	public function get($scope)
 	{
 		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s WHERE %1$s.scope = :scope', $this->tables['scopes']));

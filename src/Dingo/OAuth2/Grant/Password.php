@@ -4,8 +4,18 @@ use Closure;
 
 class Password extends Grant {
 
+	/**
+	 * The authentication callback used to authenticate a resource owner (user).
+	 * 
+	 * @var \Closure
+	 */
 	protected $authenticationCallback;
 
+	/**
+	 * Execute the grant flow.
+	 * 
+	 * @return array
+	 */
 	public function execute()
 	{
 		$client = $this->validateConfidentialClient();
@@ -41,11 +51,24 @@ class Password extends Grant {
 		return $this->response($token);
 	}
 
+	/**
+	 * Set the authentication callback used to authenticate a resource owner (user).
+	 * 
+	 * @param  \Closure  $callback
+	 * @return \Dingo\OAuth2\Grant\Password
+	 */
 	public function setAuthenticationCallback(Closure $callback)
 	{
 		$this->authenticationCallback = $callback;
+
+		return $this;
 	}
 
+	/**
+	 * Get the grant identifier.
+	 * 
+	 * @return string
+	 */
 	public function getGrantIdentifier()
 	{
 		return 'password';

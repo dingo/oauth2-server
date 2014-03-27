@@ -2,6 +2,12 @@
 
 class Token {
 
+	/**
+	 * Make a new token.
+	 * 
+	 * @param  int  $length
+	 * @return string
+	 */
 	public static function make($length = 40)
 	{
 		$randomBytes = openssl_random_pseudo_bytes($length * 2);

@@ -2,6 +2,16 @@
 
 class Token extends Entity {
 
+	/**
+	 * Create a new Dingo\OAuth2\Entity\Token instance.
+	 * 
+	 * @param  string  $token
+	 * @param  string  $type
+	 * @param  string  $clientId
+	 * @param  mixed  $userId
+	 * @param  int  $expires
+	 * @return void
+	 */
 	public function __construct($token, $type, $clientId, $userId, $expires)
 	{
 		$this->token = $token;

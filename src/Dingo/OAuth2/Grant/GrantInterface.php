@@ -2,6 +2,11 @@
 
 interface GrantInterface {
 
+	/**
+	 * Get the grant identifier.
+	 * 
+	 * @return string
+	 */
 	public function getGrantIdentifier();
 
 }

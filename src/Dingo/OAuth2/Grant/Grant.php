@@ -8,14 +8,40 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class Grant implements GrantInterface {
 
+	/**
+	 * Storage adapter instance.
+	 * 
+	 * @var \Dingo\OAuth2\Storage\Adapter
+	 */
 	protected $storage;
 
+	/**
+	 * Symfony request instance.
+	 * 
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
 	protected $request;
 
+	/**
+	 * Scope validator instance.
+	 * 
+	 * @var \Dingo\OAuth2\ScopeValidator
+	 */
 	protected $scopeValidator;
 
+	/**
+	 * Token expiration time.
+	 * 
+	 * @var int
+	 */
 	protected $tokenExpiration;
 
+	/**
+	 * Validate a confidential client by checking the client ID, secret, and any
+	 * redirection URI that was given.
+	 * 
+	 * @return \Dingo\OAuth2\Entity\Client
+	 */ 
 	protected function validateConfidentialClient()
 	{
 		// Grab the redirection URI from the post data if there is one. This is
@@ -51,16 +77,32 @@ abstract class Grant implements GrantInterface {
 		throw new \Exception('invalid_client');
 	}
 
+	/**
+	 * Validate the requested scopes.
+	 * 
+	 * @return array
+	 */
 	protected function validateScopes()
 	{
 		return $this->scopeValidator->validate();
 	}
 
+	/**
+	 * Generate a new token.
+	 * 
+	 * @return string
+	 */
 	protected function generateToken()
 	{
 		return Token::make();
 	}
 
+	/**
+	 * Build and return the token response.
+	 * 
+	 * @param  \Dingo\OAuth2\Entity\Token  $token
+	 * @return array
+	 */
 	protected function response(TokenEntity $token)
 	{
 		return [
@@ -71,6 +113,12 @@ abstract class Grant implements GrantInterface {
 		];
 	}
 
+	/**
+	 * Set the storage adapter instance.
+	 * 
+	 * @param  \Dingo\OAuth2\Storage\Adapter  $storage
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
 	public function setStorage(Adapter $storage)
 	{
 		$this->storage = $storage;
@@ -78,6 +126,12 @@ abstract class Grant implements GrantInterface {
 		return $this;
 	}
 
+	/**
+	 * Set the symfony request instance.
+	 * 
+	 * @param  \Symfony\Component\HttpFoundation\Request  $request
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
@@ -85,6 +139,12 @@ abstract class Grant implements GrantInterface {
 		return $this;
 	}
 
+	/**
+	 * Set the scope validator instance.
+	 * 
+	 * @param  \Dingo\OAuth2\ScopeValidator  $scopeValidator
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
 	public function setScopeValidator(ScopeValidator $scopeValidator)
 	{
 		$this->scopeValidator = $scopeValidator;
@@ -92,6 +152,12 @@ abstract class Grant implements GrantInterface {
 		return $this;
 	}
 
+	/**
+	 * Set the token expiration time in seconds.
+	 * 
+	 * @param  int  $expires
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
 	public function setTokenExpiration($expires)
 	{
 		$this->tokenExpiration = $expires;
@@ -99,6 +165,11 @@ abstract class Grant implements GrantInterface {
 		return $this;
 	}
 
+	/**
+	 * Get the token expiration time in seconds.
+	 * 
+	 * @return int
+	 */
 	public function getTokenExpiration()
 	{
 		return $this->tokenExpiration;
