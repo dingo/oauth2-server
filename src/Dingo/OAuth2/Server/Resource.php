@@ -1,8 +1,8 @@
 <?php namespace Dingo\OAuth2\Server;
 
 use Dingo\OAuth2\Storage\Adapter;
-use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
+use Dingo\OAuth2\Exception\InvalidTokenException;
 
 class Resource {
 
@@ -43,18 +43,22 @@ class Resource {
 	/**
 	 * Validate an access token.
 	 * 
-	 * @return bool
+	 * @return \Dingo\OAuth2\Entity\Token
+	 * @throws \Dingo\OAuth2\Exception\InvalidTokenException
 	 */
 	public function validate()
 	{
 		if ( ! $token = $this->getAccessToken())
 		{
-			return false;
+			throw new InvalidTokenException('Access token was not supplied.', 401);
 		}
 
-		$this->token = $this->storage->get('token')->get($token);
+		if ( ! $this->token = $this->storage->get('token')->get($token))
+		{
+			throw new InvalidTokenException('Invalid access token.', 401);
+		}
 
-		return $this->token instanceof TokenEntity;
+		return $this->token;
 	}
 
 	/**
