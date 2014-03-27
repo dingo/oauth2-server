@@ -22,6 +22,20 @@ interface TokenInterface {
 	public function create($token, $type, $clientId, $userId, $expires);
 
 	/**
+	 * Associate scopes with a token. The array will contain instances of
+	 * \Dingo\OAuth2\Entity\Scope.
+	 * 
+	 * Example MySQL query to associate a scope with the token:
+	 * 
+	 * INSERT INTO oauth_token_scopes (token, scope) VALUES (:token, :scope)
+	 * 
+	 * @param  string  $token
+	 * @param  array  $scopes
+	 * @return void
+	 */
+	public function associateScopes($token, array $scopes);
+
+	/**
 	 * Get an access token from storage. The expires time MUST be returned as
 	 * a UNIX timestamp. This method should also retrieve the associated
 	 * scopes of the token and attach them to the token entity.

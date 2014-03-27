@@ -38,6 +38,13 @@ class Token extends PDO implements TokenInterface {
 		return new TokenEntity($token, $type, $clientId, $userId, $expires);
 	}
 
+	/**
+	 * Associate scopes with a token.
+	 * 
+	 * @param  string  $token
+	 * @param  array  $scopes
+	 * @return void
+	 */
 	public function associateScopes($token, array $scopes)
 	{
 		foreach ($scopes as $scope)
