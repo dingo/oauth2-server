@@ -3,6 +3,7 @@
 use Dingo\OAuth2\Token;
 use Dingo\OAuth2\ScopeValidator;
 use Dingo\OAuth2\Storage\Adapter;
+use Dingo\OAuth2\Exception\ClientException;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,6 +42,7 @@ abstract class Grant implements GrantInterface {
 	 * redirection URI that was given.
 	 * 
 	 * @return \Dingo\OAuth2\Entity\Client
+	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */ 
 	protected function validateConfidentialClient()
 	{
@@ -74,7 +76,7 @@ abstract class Grant implements GrantInterface {
 			return $client;
 		}
 
-		throw new \Exception('invalid_client');
+		throw new ClientException('The client failed to authenticate.', 401);
 	}
 
 	/**

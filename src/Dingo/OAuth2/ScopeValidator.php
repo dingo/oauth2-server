@@ -1,6 +1,7 @@
 <?php namespace Dingo\OAuth2;
 
 use Dingo\OAuth2\Storage\ScopeInterface;
+use Dingo\OAuth2\Exception\ClientException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ScopeValidator {
@@ -50,6 +51,7 @@ class ScopeValidator {
 	 * Validate the requested scopes.
 	 * 
 	 * @return array
+	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
 	public function validate()
 	{
@@ -64,7 +66,7 @@ class ScopeValidator {
 
 		if ($this->scopeRequired and is_null($this->defaultScope) and empty($requestedScopes))
 		{
-			throw new \Exception('invalid_request scope is required');
+			throw new ClientException('The request is missing the "scope" parameter.', 400);
 		}
 		elseif ($this->defaultScope and empty($requestedScopes))
 		{
@@ -73,11 +75,11 @@ class ScopeValidator {
 
 		$scopes = [];
 
-		foreach ($requestedScopes as $scope)
+		foreach ($requestedScopes as $requestedScope)
 		{
-			if ( ! $scope = $this->storage->get($scope))
+			if ( ! $scope = $this->storage->get($requestedScope))
 			{
-				throw new \Exception('invalid_scope');
+				throw new ClientException("The requested scope [{$requestedScope}] is invalid or unknown.");
 			}
 
 			$scopes[$scope->getScope()] = $scope;

@@ -3,6 +3,7 @@
 use Dingo\OAuth2\ScopeValidator;
 use Dingo\OAuth2\Storage\Adapter;
 use Dingo\OAuth2\Grant\GrantInterface;
+use Dingo\OAuth2\Exception\ClientException;
 use Symfony\Component\HttpFoundation\Request;
 
 class Authorization {
@@ -95,22 +96,23 @@ class Authorization {
 	 * If applicable and enabled, a refresh token will also be included.
 	 * 
 	 * @return array
+	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
 	public function issueToken()
 	{
 		if ( ! $this->request->isMethod('post'))
 		{
-			throw new \Exception('invalid_request');
+			throw new ClientException('The request method must be POST.', 400);
 		}
 
 		if ( ! $grant = $this->request->request->get('grant_type'))
 		{
-			throw new \Exception('invalid_request');
+			throw new ClientException('The request is missing the "grant_type" parameter.', 400);
 		}
 
 		if ( ! isset($this->grants[$grant]))
 		{
-			throw new \Exception('unsupported_grant_type');
+			throw new ClientException('The authorization server does not support the requested grant.');
 		}
 
 		$grant = $this->grants[$grant];

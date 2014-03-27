@@ -1,6 +1,8 @@
 <?php namespace Dingo\OAuth2\Grant;
 
 use Closure;
+use RuntimeException;
+use Dingo\OAuth2\Exception\ClientException;
 
 class Password extends Grant {
 
@@ -15,6 +17,8 @@ class Password extends Grant {
 	 * Execute the grant flow.
 	 * 
 	 * @return array
+	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 * @throws \RuntimeException
 	 */
 	public function execute()
 	{
@@ -24,12 +28,12 @@ class Password extends Grant {
 
 		if ( ! $username = $requestData->get('username') or ! $password = $requestData->get('password'))
 		{
-			throw new \Exception('invalid_request');
+			throw new ClientException('The request is missing the "username" or "password" parameter.', 400);
 		}
 
 		if ( ! $userId = call_user_func($this->authenticationCallback, $username, $password))
 		{
-			throw new \Exception('invalid_credentials');
+			throw new ClientException('The user credentials failed to authenticate.', 400);
 		}
 
 		$scopes = $this->validateScopes();
@@ -38,10 +42,7 @@ class Password extends Grant {
 		// saved with the storage adapter we can return our array response.
 		$expires = time() + $this->getTokenExpiration();
 
-		if ( ! $token = $this->storage->get('token')->create($this->generateToken(), 'access', $client->getId(), $userId, $expires))
-		{
-			throw new \Exception('failed_to_save_token');
-		}
+		$token = $this->storage->get('token')->create($this->generateToken(), 'access', $client->getId(), $userId, $expires);
 
 		if ($scopes)
 		{
