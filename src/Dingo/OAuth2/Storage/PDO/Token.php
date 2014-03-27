@@ -3,7 +3,7 @@
 use Dingo\OAuth2\Storage\TokenInterface;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 
-class Token implements TokenInterface {
+class Token extends PDO implements TokenInterface {
 
 	/**
 	 * Insert a token into storage.

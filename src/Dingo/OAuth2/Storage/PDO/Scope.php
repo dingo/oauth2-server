@@ -1,10 +1,9 @@
 <?php namespace Dingo\OAuth2\Storage\PDO;
 
-use PDO;
 use Dingo\OAuth2\Storage\ScopeInterface;
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
-class Scope implements ScopeInterface {
+class Scope extends PDO implements ScopeInterface {
 
 	/**
 	 * Get a scope from storage.

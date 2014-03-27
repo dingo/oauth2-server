@@ -3,7 +3,7 @@
 use Dingo\OAuth2\Storage\ClientInterface;
 use Dingo\OAuth2\Entity\Client as ClientEntity;
 
-class Client implements ClientInterface {
+class Client extends PDO implements ClientInterface {
 
 	/**
 	 * Get a client from storage.
