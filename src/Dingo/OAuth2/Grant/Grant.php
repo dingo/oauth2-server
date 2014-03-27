@@ -51,6 +51,8 @@ abstract class Grant implements GrantInterface {
 		// matter if we send along a "null" value though.
 		$redirectUri = $this->request->request->get('redirect_uri');
 
+		$id = $secret = null;
+
 		// If the "Authorization" header exists within the request then we will
 		// attempt to pull the clients ID and secret from there.
 		if ($this->request->headers->has('authorization'))
@@ -62,7 +64,7 @@ abstract class Grant implements GrantInterface {
 
 		// Otherwise we'll default to pulling the clients ID and secret from the
 		// requests post data. It's preferred if clients use HTTP basic.
-		else
+		if ( ! $id or ! $secret)
 		{
 			$id = $this->request->request->get('client_id');
 
