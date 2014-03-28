@@ -31,11 +31,18 @@ abstract class Grant implements GrantInterface {
 	protected $scopeValidator;
 
 	/**
-	 * Token expiration time.
+	 * Access token expiration in seconds.
 	 * 
 	 * @var int
 	 */
-	protected $tokenExpiration;
+	protected $accessTokenExpiration;
+
+	/**
+	 * Refresh token expiration in seconds.
+	 * 
+	 * @var int
+	 */
+	protected $refreshTokenExpiration;
 
 	/**
 	 * Validate a confidential client by checking the client ID, secret, and any
@@ -84,11 +91,12 @@ abstract class Grant implements GrantInterface {
 	/**
 	 * Validate the requested scopes.
 	 * 
+	 * @param  array  $originalScopes
 	 * @return array
 	 */
-	protected function validateScopes()
+	protected function validateScopes(array $originalScopes = [])
 	{
-		return $this->scopeValidator->validate();
+		return $this->scopeValidator->validate($originalScopes);
 	}
 
 	/**
@@ -96,25 +104,9 @@ abstract class Grant implements GrantInterface {
 	 * 
 	 * @return string
 	 */
-	protected function generateToken()
+	public function generateToken()
 	{
 		return Token::make();
-	}
-
-	/**
-	 * Build and return the token response.
-	 * 
-	 * @param  \Dingo\OAuth2\Entity\Token  $token
-	 * @return array
-	 */
-	protected function response(TokenEntity $token)
-	{
-		return [
-			'access_token' => $token->getToken(),
-			'token_type'   => 'Bearer',
-			'expires'      => $token->getExpires(),
-			'expires_in'   => $this->getTokenExpiration()
-		];
 	}
 
 	/**
@@ -157,26 +149,49 @@ abstract class Grant implements GrantInterface {
 	}
 
 	/**
-	 * Set the token expiration time in seconds.
+	 * Set the access token expiration time in seconds.
 	 * 
 	 * @param  int  $expires
 	 * @return \Dingo\OAuth2\Grant\Grant
 	 */
-	public function setTokenExpiration($expires)
+	public function setAccessTokenExpiration($expires)
 	{
-		$this->tokenExpiration = $expires;
+		$this->accessTokenExpiration = $expires;
 
 		return $this;
 	}
 
 	/**
-	 * Get the token expiration time in seconds.
+	 * Set the refresh token expiration time in seconds.
+	 * 
+	 * @param  int  $expires
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
+	public function setRefreshTokenExpiration($expires)
+	{
+		$this->refreshTokenExpiration = $expires;
+
+		return $this;
+	}
+
+	/**
+	 * Get the access token expiration time in seconds.
 	 * 
 	 * @return int
 	 */
-	public function getTokenExpiration()
+	public function getAccessTokenExpiration()
 	{
-		return $this->tokenExpiration;
+		return $this->accessTokenExpiration;
+	}
+
+	/**
+	 * Get the refresh token expiration time in seconds.
+	 * 
+	 * @return int
+	 */
+	public function getRefreshTokenExpiration()
+	{
+		return $this->accessTokenExpiration;
 	}
 
 }

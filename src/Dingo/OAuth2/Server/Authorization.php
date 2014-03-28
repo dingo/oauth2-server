@@ -4,6 +4,7 @@ use Dingo\OAuth2\ScopeValidator;
 use Dingo\OAuth2\Storage\Adapter;
 use Dingo\OAuth2\Grant\GrantInterface;
 use Dingo\OAuth2\Exception\ClientException;
+use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
 
 class Authorization {
@@ -30,6 +31,13 @@ class Authorization {
 	protected $scopeValidator;
 
 	/**
+	 * Array of registered grants.
+	 * 
+	 * @var array
+	 */
+	protected $grants = [];
+
+	/**
 	 * Access token expiration in seconds.
 	 * 
 	 * @var int
@@ -44,11 +52,13 @@ class Authorization {
 	protected $refreshTokenExpiration = 3600;
 
 	/**
-	 * Array of registered grants.
+	 * Array of grants that are refresh token enabled.
 	 * 
 	 * @var array
 	 */
-	protected $grants = [];
+	protected $refreshEnabledGrants = [
+		'password'
+	];
 
 	/**
 	 * Create a new Dingo\OAuth2\Server\Authorization instance.
@@ -84,6 +94,10 @@ class Authorization {
 		// the storage adapter so we'll set these on the grant.
 		$grant->setRequest($this->request) and $grant->setStorage($this->storage);
 
+		// Set the access token expiration time and the refresh token
+		// expiration time on each of the grants. Some use both and
+		// some don't but all grants can have both.
+
 		$this->grants[$key] = $grant;
 
 		return $this;
@@ -98,7 +112,7 @@ class Authorization {
 	 * @return array
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
-	public function issueToken(array $payload = [])
+	public function issueAccessToken(array $payload = [])
 	{
 		// The payload may optionally be given as a parameter to this method
 		// instead of in the request body. This is useful when proxying
@@ -121,19 +135,58 @@ class Authorization {
 
 		if ( ! isset($this->grants[$grant]))
 		{
-			throw new ClientException('The authorization server does not support the requested grant.');
+			throw new ClientException('The authorization server does not support the requested grant.', 400);
 		}
 
-		$grant = $this->grants[$grant];
+		$accessToken = $this->grants[$grant]->execute();
 
-		$token = $grant->setTokenExpiration($this->accessTokenExpiration)->execute();
+		$response = $this->makeResponseFromToken($accessToken);
 
-		if (isset($this->grants['refresh']))
+		// If the "refresh" grant has been registered we'll issue a refresh token
+		// so that clients can easily renew their access tokens.
+		if (isset($this->grants['refresh_token']) and in_array($grant, $this->refreshEnabledGrants))
 		{
-			// TODO: Implement the addition of a refresh token.
+			$refreshToken = $this->issueRefreshToken($accessToken);
+
+			$response['refresh_token'] = $refreshToken;
 		}
 
-		return $token;
+		return $response;
+	}
+
+	/**
+	 * Issue a refresh token.
+	 * 
+	 * @param  \Dingo\OAuth2\Entity\Token  $accessToken
+	 * @return string
+	 */
+	protected function issueRefreshToken(TokenEntity $accessToken)
+	{
+		$refreshToken = $this->grants['refresh_token']->generateToken();
+
+		$expires = time() + $this->refreshTokenExpiration;
+
+		$this->storage->get('token')->create($refreshToken, 'refresh', $accessToken->getClientId(), $accessToken->getUserId(), $expires);
+
+		$this->storage->get('token')->associateScopes($refreshToken, $accessToken->getScopes());
+
+		return $refreshToken;
+	}
+
+	/**
+	 * Make an array response from an access token.
+	 * 
+	 * @param  \Dingo\OAuth2\Entity\Token  $accessToken
+	 * @return array
+	 */
+	protected function makeResponseFromToken(TokenEntity $accessToken)
+	{
+		return [
+			'access_token' => $accessToken->getToken(),
+			'token_type'   => 'Bearer',
+			'expires'      => $accessToken->getExpires(),
+			'expires_in'   => $this->accessTokenExpiration
+		];
 	}
 
 	/**

@@ -48,12 +48,15 @@ class ScopeValidator {
 	}
 
 	/**
-	 * Validate the requested scopes.
+	 * Validate the requested scopes. If an array of original scopes is given
+	 * then it will also validate that any scopes provided exist in the
+	 * original scopes (from a refresh token).
 	 * 
+	 * @param  array  $originalScopes
 	 * @return array
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
-	public function validate()
+	public function validate(array $originalScopes = [])
 	{
 		$requestedScopes = explode($this->scopeDelimiter, $this->request->request->get('scope'));
 
@@ -64,13 +67,31 @@ class ScopeValidator {
 			return trim($scope);
 		}, $requestedScopes));
 
-		if ($this->scopeRequired and is_null($this->defaultScope) and empty($requestedScopes))
+		if ($this->scopeRequired and is_null($this->defaultScope) and empty($requestedScopes) and empty($originalScopes))
 		{
 			throw new ClientException('The request is missing the "scope" parameter.', 400);
 		}
 		elseif ($this->defaultScope and empty($requestedScopes))
 		{
 			$requestedScopes = (array) $this->defaultScope;
+		}
+		elseif ( ! empty($originalScopes) and empty($requestedScopes))
+		{
+			$requestedScopes = array_keys($originalScopes);
+		}
+
+		// If original scopes were declared for this token we'll compare the requested
+		// scopes to ensure that any new scopes aren't added. If a new scope is
+		// found we'll abort with an exception.
+		if ( ! empty($originalScopes))
+		{
+			foreach ($requestedScopes as $requestedScope)
+			{
+				if ( ! isset($originalScopes[$requestedScope]))
+				{
+					throw new ClientException("The requested scope [{$requestedScope}] was not originally requested for this token.", 400);
+				}
+			}
 		}
 
 		$scopes = [];
@@ -79,7 +100,7 @@ class ScopeValidator {
 		{
 			if ( ! $scope = $this->storage->get($requestedScope))
 			{
-				throw new ClientException("The requested scope [{$requestedScope}] is invalid or unknown.");
+				throw new ClientException("The requested scope [{$requestedScope}] is invalid or unknown.", 400);
 			}
 
 			$scopes[$scope->getScope()] = $scope;

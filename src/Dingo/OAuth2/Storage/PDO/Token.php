@@ -47,12 +47,12 @@ class Token extends PDO implements TokenInterface {
 	 */
 	public function associateScopes($token, array $scopes)
 	{
+		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s 
+			(token, scope) VALUES 
+			(:token, :scope)', $this->tables['token_scopes']));
+
 		foreach ($scopes as $scope)
 		{
-			$query = $this->connection->prepare(sprintf('INSERT INTO %1$s 
-				(token, scope) VALUES 
-				(:token, :scope)', $this->tables['token_scopes']));
-
 			$query->execute([':token' => $token, ':scope' => $scope->getScope()]);
 		}
 	}

@@ -22,8 +22,6 @@ class Password extends Grant {
 	 */
 	public function execute()
 	{
-		$client = $this->validateConfidentialClient();
-
 		$requestData = $this->request->request;
 
 		if ( ! $username = $requestData->get('username') or ! $password = $requestData->get('password'))
@@ -36,20 +34,24 @@ class Password extends Grant {
 			throw new ClientException('The user credentials failed to authenticate.', 400);
 		}
 
+		$client = $this->validateConfidentialClient();
+
 		$scopes = $this->validateScopes();
 
 		// Generate and create a new access token. Once the token has been generated and
 		// saved with the storage adapter we can return our array response.
-		$expires = time() + $this->getTokenExpiration();
+		$expires = time() + $this->accessTokenExpiration;
 
 		$token = $this->storage->get('token')->create($this->generateToken(), 'access', $client->getId(), $userId, $expires);
 
 		if ($scopes)
 		{
 			$this->storage->get('token')->associateScopes($token->getToken(), $scopes);
+
+			$token->attachScopes($scopes);
 		}
 
-		return $this->response($token);
+		return $token;
 	}
 
 	/**
