@@ -61,11 +61,23 @@ class Client extends PDO implements ClientInterface {
 			return false;
 		}
 
-		// If no redirection URI was given then we'll set it to null so that we
-		// can create a new Dingo\OAuth2\Entity\Client instance.
+		// If no redirection URI was given then we'll fetch one from storage so that
+		// it can be included in the entity.
 		if ( ! isset($client['redirect_uri']))
 		{
-			$client['redirect_uri'] = null;
+			$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s 
+				WHERE %1$s.client_id = :client_id AND is_default = 1 LIMIT 1', $this->tables['client_endpoints']));
+
+			$query->execute([':client_id' => $client['id']]);
+
+			if ($endpoint = $query->fetch())
+			{
+				$client['redirect_uri'] = $endpoint['uri'];
+			}
+			else
+			{
+				$client['redirect_uri'] = null;
+			}
 		}
 
 		return new ClientEntity($client['id'], $client['secret'], $client['name'], $client['redirect_uri']);

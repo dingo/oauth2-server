@@ -58,7 +58,7 @@ class ScopeValidator {
 	 */
 	public function validate(array $originalScopes = [])
 	{
-		$requestedScopes = explode($this->scopeDelimiter, $this->request->request->get('scope'));
+		$requestedScopes = explode($this->scopeDelimiter, $this->request->request->get('scope') ?: $this->request->query->get('scope'));
 
 		// Spin through all the scopes in the request and filter out any that
 		// are blank or invalid.

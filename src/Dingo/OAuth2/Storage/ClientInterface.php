@@ -4,6 +4,8 @@ interface ClientInterface {
 
 	/**
 	 * Get a client from storage. Should return false if client was not found.
+	 * If no redirection URI is provided then another query should be run
+	 * to fetch the default URI from the related table.
 	 * 
 	 * Example MySQL query when secret and redirection URI are provided:
 	 * 

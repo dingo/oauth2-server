@@ -4,6 +4,7 @@ use PDO;
 use Dingo\OAuth2\Storage\PDO\Scope;
 use Dingo\OAuth2\Storage\PDO\Token;
 use Dingo\OAuth2\Storage\PDO\Client;
+use Dingo\OAuth2\Storage\PDO\AuthorizationCode;
 
 class PdoAdapter extends Adapter {
 
@@ -24,7 +25,7 @@ class PdoAdapter extends Adapter {
 		'client_endpoints'          => 'oauth_client_endpoints',
 		'tokens'                    => 'oauth_tokens',
 		'token_scopes'              => 'oauth_token_scopes',
-		'authorization_code'        => 'oauth_authorization_codes',
+		'authorization_codes'       => 'oauth_authorization_codes',
 		'authorization_code_scopes' => 'oauth_authorization_code_scopes',
 		'scopes'                    => 'oauth_scopes'
 	];
@@ -67,9 +68,9 @@ class PdoAdapter extends Adapter {
 	 * 
 	 * @return \Dingo\OAuth2\Storage\PDO\AuthorizationCode
 	 */
-	public function createAuthorizationCodeStorage()
+	public function createAuthorizationStorage()
 	{
-
+		return new AuthorizationCode($this->connection, $this->tables);
 	}
 
 	/**

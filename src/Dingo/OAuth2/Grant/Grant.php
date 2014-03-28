@@ -100,6 +100,24 @@ abstract class Grant implements GrantInterface {
 	}
 
 	/**
+	 * Validate that the request includes given parameters.
+	 * 
+	 * @param  array  $parameters
+	 * @return void
+	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 */
+	protected function validateRequestParameters(array $parameters)
+	{
+		foreach ($parameters as $parameter)
+		{
+			if ( ! $this->request->get($parameter))
+			{
+				throw new ClientException('The request is missing the "'.$parameter.'" parameter.', 400);
+			}
+		}
+	}
+
+	/**
 	 * Generate a new token.
 	 * 
 	 * @return string
@@ -192,6 +210,16 @@ abstract class Grant implements GrantInterface {
 	public function getRefreshTokenExpiration()
 	{
 		return $this->accessTokenExpiration;
+	}
+
+	/**
+	 * Get the response type.
+	 * 
+	 * @return string
+	 */
+	public function getResponseType()
+	{
+		return null;
 	}
 
 }

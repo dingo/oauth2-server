@@ -57,8 +57,16 @@ class Authorization {
 	 * @var array
 	 */
 	protected $refreshEnabledGrants = [
-		'password'
+		'password',
+		'authorization_code'
 	];
+
+	/**
+	 * Array of valid response types.
+	 * 
+	 * @var array
+	 */
+	protected $responseTypes = [];
 
 	/**
 	 * Create a new Dingo\OAuth2\Server\Authorization instance.
@@ -100,6 +108,11 @@ class Authorization {
 		$grant->setAccessTokenExpiration($this->accessTokenExpiration) and $grant->setRefreshTokenExpiration($this->refreshTokenExpiration);
 
 		$this->grants[$key] = $grant;
+
+		if ($grant->getResponseType())
+		{
+			$this->responseTypes[] = $grant->getResponseType();
+		}
 
 		return $this;
 	}
@@ -188,6 +201,49 @@ class Authorization {
 			'expires'      => $accessToken->getExpires(),
 			'expires_in'   => $this->accessTokenExpiration
 		];
+	}
+
+	/**
+	 * Validate an authorization request. This performs a few prior checks
+	 * before handing the heavy lifitng off to the authorization code
+	 * grant.
+	 * 
+	 * @return array
+	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 */
+	public function validateAuthorizationRequest()
+	{
+		if ( ! isset($this->grants['authorization_code']))
+		{
+			throw new ClientException('The authorization server does not support the requested grant.', 400);
+		}
+
+		if ( ! in_array($this->request->get('response_type'), $this->responseTypes))
+		{
+			throw new ClientException('The authorization server does not recognize the provided response type.', 400);
+		}
+
+		return $this->grants['authorization_code']->validateAuthorizationRequest();
+	}
+
+	/**
+	 * Create an authorization code.
+	 * 
+	 * @param  string  $clientId
+	 * @param  mixed  $userId
+	 * @param  string  $redirectUri
+	 * @param  array  $scopes
+	 * @return \Dingo\OAuth2\Entity\AuthorizationCode
+	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 */
+	public function createAuthorizationCode($clientId, $userId, $redirectUri, array $scopes)
+	{
+		if ( ! isset($this->grants['authorization_code']))
+		{
+			throw new ClientException('The authorization server does not support the requested grant.', 400);
+		}
+
+		return $this->grants['authorization_code']->createAuthorizationCode($clientId, $userId, $redirectUri, $scopes);
 	}
 
 	/**

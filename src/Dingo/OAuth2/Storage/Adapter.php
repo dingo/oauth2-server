@@ -30,7 +30,7 @@ abstract class Adapter {
 	 * 
 	 * @return \Dingo\OAuth2\Storage\AuthorizationCodeInterface
 	 */
-	abstract public function createAuthorizationCodeStorage();
+	abstract public function createAuthorizationStorage();
 
 	/**
 	 * Create the scope storage instance.
