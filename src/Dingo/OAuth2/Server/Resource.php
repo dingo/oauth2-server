@@ -77,7 +77,7 @@ class Resource {
 	 */
 	protected function tokenHasExpired(TokenEntity $token)
 	{
-		return $this->token->getExpires() < time();
+		return $token->getExpires() < time();
 	}
 
 	/**

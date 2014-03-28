@@ -97,6 +97,7 @@ class Authorization {
 		// Set the access token expiration time and the refresh token
 		// expiration time on each of the grants. Some use both and
 		// some don't but all grants can have both.
+		$grant->setAccessTokenExpiration($this->accessTokenExpiration) and $grant->setRefreshTokenExpiration($this->refreshTokenExpiration);
 
 		$this->grants[$key] = $grant;
 
