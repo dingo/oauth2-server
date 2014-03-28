@@ -96,4 +96,18 @@ class Token extends PDO implements TokenInterface {
 		return $token;
 	}
 
+	/**
+	 * Delete an access token from storage.
+	 * 
+	 * @param  string  $token
+	 * @return void
+	 */
+	public function delete($token)
+	{
+		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE token = :token;
+			DELETE FROM %2$s WHERE token = :token', $this->tables['tokens'], $this->tables['token_scopes']));
+
+		$query->execute([':token' => $token]);
+	}
+
 }

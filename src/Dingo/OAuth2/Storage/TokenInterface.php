@@ -55,4 +55,13 @@ interface TokenInterface {
 	 */
 	public function get($token);
 
+	/**
+	 * Delete an access token from storage. This method should also delete
+	 * any associated scopes.
+	 * 
+	 * @param  string  $token
+	 * @return void
+	 */
+	public function delete($token);
+
 }

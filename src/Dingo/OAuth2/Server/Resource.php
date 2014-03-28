@@ -1,6 +1,7 @@
 <?php namespace Dingo\OAuth2\Server;
 
 use Dingo\OAuth2\Storage\Adapter;
+use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Dingo\OAuth2\Exception\InvalidTokenException;
 
@@ -58,7 +59,25 @@ class Resource {
 			throw new InvalidTokenException('Invalid access token.', 401);
 		}
 
+		if ($this->tokenHasExpired($this->token))
+		{
+			$this->storage->get('token')->delete($token);
+
+			throw new InvalidTokenException('Access token has expired.', 401);
+		}
+
 		return $this->token;
+	}
+
+	/**
+	 * Determine if a token has expired.
+	 * 
+	 * @param  \Dingo\OAuth2\Entity\Token  $token
+	 * @return bool
+	 */
+	protected function tokenHasExpired(TokenEntity $token)
+	{
+		return $this->token->getExpires() < time();
 	}
 
 	/**
