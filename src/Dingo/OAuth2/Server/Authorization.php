@@ -98,8 +98,17 @@ class Authorization {
 	 * @return array
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
-	public function issueToken()
+	public function issueToken(array $payload = [])
 	{
+		// The payload may optionally be given as a parameter to this method
+		// instead of in the request body. This is useful when proxying
+		// AJAX requests to avoid disclosing confidential client
+		// details in your source code.
+		if ( ! empty($payload))
+		{
+			$this->request->request->replace($payload);
+		}
+
 		if ( ! $this->request->isMethod('post'))
 		{
 			throw new ClientException('The request method must be POST.', 400);
