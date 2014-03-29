@@ -124,6 +124,33 @@ abstract class Grant implements GrantInterface {
 	}
 
 	/**
+	 * Create a new token in the storage.
+	 * 
+	 * @param  string  $type
+	 * @param  string  $clientId
+	 * @param  mixed  $userId
+	 * @param  array  $scopes
+	 * @return \Dingo\OAuth2\Entity\Token
+	 */
+	protected function createToken($type, $clientId, $userId, array $scopes = [])
+	{
+		$token = $this->generateToken();
+
+		$expires = time() + $this->{$type.'TokenExpiration'};
+
+		$token = $this->storage->get('token')->create($token, $type, $clientId, $userId, $expires);
+
+		if ($scopes)
+		{
+			$this->storage->get('token')->associateScopes($token->getToken(), $scopes);
+
+			$token->attachScopes($scopes);
+		}
+
+		return $token;
+	}
+
+	/**
 	 * Generate a new token.
 	 * 
 	 * @return string

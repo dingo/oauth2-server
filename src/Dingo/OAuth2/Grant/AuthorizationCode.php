@@ -84,19 +84,7 @@ class AuthorizationCode extends Grant {
 			throw new ClientException('The authorization code has expired.', 400);
 		}
 
-		// Everything has been checked so we can proceed with the creation of the
-		// access token. We'll grab the scopes from the authorization code
-		// and associate them with the new token.
-		$expires = time() + $this->accessTokenExpiration;
-
-		$token = $this->storage->get('token')->create($this->generateToken(), 'access', $client->getId(), $code->getUserId(), $expires);
-
-		if ($code->getScopes())
-		{
-			$this->storage->get('token')->associateScopes($token->getToken(), $code->getScopes());
-
-			$token->attachScopes($code->getScopes());
-		}
+		$token = $this->createToken('access', $client->getId(), $code->getUserId(), $code->getScopes());
 
 		// We no longer need the authorization code so we can safely delete it
 		// from the storage.
