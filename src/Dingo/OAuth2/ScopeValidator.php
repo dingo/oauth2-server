@@ -67,15 +67,24 @@ class ScopeValidator {
 			return trim($scope);
 		}, $requestedScopes));
 
+		// If the scope parameter is required and no default scope was provided
+		// or original scopes then we'll alert the client that the scope
+		// parameter was missing.
 		if ($this->scopeRequired and is_null($this->defaultScope) and empty($requestedScopes) and empty($originalScopes))
 		{
 			throw new ClientException('The request is missing the "scope" parameter.', 400);
 		}
+
+		// If default scopes were provided and no scopes were requested then
+		// we'll set the requested scopes to the default scopes.
 		elseif ($this->defaultScope and empty($requestedScopes))
 		{
 			$requestedScopes = (array) $this->defaultScope;
 		}
-		elseif ( ! empty($originalScopes) and empty($requestedScopes))
+
+		// If there were original scopes provided then we'll set the requested
+		// scopes to the original scopes.
+		if ( ! empty($originalScopes) and empty($requestedScopes))
 		{
 			$requestedScopes = array_keys($originalScopes);
 		}
