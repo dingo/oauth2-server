@@ -215,7 +215,7 @@ class Authorization {
 	{
 		if ( ! isset($this->grants['authorization_code']))
 		{
-			throw new ClientException('The authorization server does not support the requested grant.', 400);
+			throw new ClientException('The authorization code grant is not registered with the authorization server.', 400);
 		}
 
 		if ( ! in_array($this->request->get('response_type'), $this->responseTypes))
