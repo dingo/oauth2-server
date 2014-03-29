@@ -11,6 +11,9 @@
     "require": {
         "symfony/http-foundation": "2.4.*"
     },
+    "require-dev": {
+        "mockery/mockery": "0.9.*"
+    },
     "autoload": {
         "psr-0": {
             "Dingo\\OAuth2": "src"
