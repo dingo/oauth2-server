@@ -24,10 +24,7 @@ class Password extends Grant {
 	{
 		$requestData = $this->request->request;
 
-		if ( ! $username = $requestData->get('username') or ! $password = $requestData->get('password'))
-		{
-			throw new ClientException('The request is missing the "username" or "password" parameter.', 400);
-		}
+		list ($username, $password) = $this->validateRequestParameters(['username', 'password']);
 
 		if ( ! $userId = call_user_func($this->authenticationCallback, $username, $password))
 		{
