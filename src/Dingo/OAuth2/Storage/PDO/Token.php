@@ -75,6 +75,22 @@ class Token extends PDO implements TokenInterface {
 
 		$token = new TokenEntity($token['token'], $token['type'], $token['client_id'], $token['user_id'], strtotime($token['expires']));
 
+		return $token;
+	}
+
+	/**
+	 * Get an access token from storage with associated scopes.
+	 * 
+	 * @param  string  $token
+	 * @return \Dingo\OAuth2\Entity\Token|bool
+	 */
+	public function getWithScopes($token)
+	{
+		if ( ! $token = $this->get($token))
+		{
+			return false;
+		}
+
 		// Now that the token has been fetched and the entity created we'll also fetch
 		// the associated scopes of the token.
 		$query = $this->connection->prepare(sprintf('SELECT %1$s.* FROM %1$s

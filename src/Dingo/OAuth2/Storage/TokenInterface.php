@@ -37,6 +37,19 @@ interface TokenInterface {
 
 	/**
 	 * Get an access token from storage. The expires time MUST be returned as
+	 * a UNIX timestamp.
+	 * 
+	 * Example MySQL query:
+	 * 
+	 * SELECT * FROM oauth_tokens WHERE token = :token
+	 * 
+	 * @param  string  $token
+	 * @return \Dingo\OAuth2\Entity\Token|bool
+	 */
+	public function get($token);
+
+	/**
+	 * Get an access token from storage. The expires time MUST be returned as
 	 * a UNIX timestamp. This method should also retrieve the associated
 	 * scopes of the token and attach them to the token entity.
 	 * 
@@ -53,7 +66,7 @@ interface TokenInterface {
 	 * @param  string  $token
 	 * @return \Dingo\OAuth2\Entity\Token|bool
 	 */
-	public function get($token);
+	public function getWithScopes($token);
 
 	/**
 	 * Delete an access token from storage. This method should also delete

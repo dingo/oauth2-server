@@ -15,7 +15,7 @@ class RefreshToken extends Grant {
 
 		$client = $this->validateConfidentialClient();
 
-		$oldToken = $this->storage->get('token')->get($token);
+		$oldToken = $this->storage->get('token')->getWithScopes($token);
 
 		$scopes = $this->validateScopes($oldToken->getScopes());
 
