@@ -1,6 +1,6 @@
 <?php namespace Dingo\OAuth2\Entity;
 
-class Token extends Entity {
+class Token extends ScopeableEntity {
 
 	/**
 	 * Create a new Dingo\OAuth2\Entity\Token instance.
@@ -20,39 +20,6 @@ class Token extends Entity {
 		$this->userId = $userId;
 		$this->expires = $expires;
 		$this->scopes = [];
-	}
-
-	/**
-	 * Attach scopes to the token.
-	 * 
-	 * @param  array  $scopes
-	 * @return void
-	 */
-	public function attachScopes(array $scopes)
-	{
-		$this->scopes = $scopes;
-	}
-
-	/**
-	 * Get a scope.
-	 * 
-	 * @param  string  $scope
-	 * @return \Dingo\OAuth2\Entity\Scope
-	 */
-	public function getScope($scope)
-	{
-		return $this->scopes[$scope];
-	}
-
-	/**
-	 * Determine if token has a scope.
-	 * 
-	 * @param  string  $scope
-	 * @return bool
-	 */
-	public function hasScope($scope)
-	{
-		return isset($this->scopes[$scope]);
 	}
 
 }
