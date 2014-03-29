@@ -103,18 +103,24 @@ abstract class Grant implements GrantInterface {
 	 * Validate that the request includes given parameters.
 	 * 
 	 * @param  array  $parameters
-	 * @return void
+	 * @return array
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
 	protected function validateRequestParameters(array $parameters)
 	{
+		$values = [];
+
 		foreach ($parameters as $parameter)
 		{
 			if ( ! $this->request->get($parameter))
 			{
 				throw new ClientException('The request is missing the "'.$parameter.'" parameter.', 400);
 			}
+
+			$values[] = $this->request->get($parameter);
 		}
+
+		return $values;
 	}
 
 	/**
