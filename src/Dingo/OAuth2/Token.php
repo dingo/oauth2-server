@@ -1,5 +1,7 @@
 <?php namespace Dingo\OAuth2;
 
+use RuntimeException;
+
 class Token {
 
 	/**
@@ -7,6 +9,7 @@ class Token {
 	 * 
 	 * @param  int  $length
 	 * @return string
+	 * @throws \RuntimeException
 	 */
 	public static function make($length = 40)
 	{
