@@ -96,6 +96,12 @@ class AuthorizationCode extends PDO implements AuthorizationCodeInterface {
 		return $code;
 	}
 
+	/**
+	 * Delete an authorization code from storage.
+	 * 
+	 * @param  string  $code
+	 * @return void
+	 */
 	public function delete($code)
 	{
 		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE code = :code;
