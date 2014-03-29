@@ -96,9 +96,9 @@ class Resource {
 				return $token;
 			}
 		}
-		elseif ($this->request->request->has('access_token'))
+		elseif ($this->request->get('access_token'))
 		{
-			return $this->request->request->get('access_token');
+			return $this->request->get('access_token');
 		}
 
 		return false;
