@@ -321,4 +321,26 @@ class Authorization {
 		return $this;
 	}
 
+	/**
+	 * Determine if authorization server has a grant.
+	 * 
+	 * @param  string  $grant
+	 * @return bool
+	 */
+	public function hasGrant($grant)
+	{
+		return isset($this->grants[$grant]);
+	}
+
+	/**
+	 * Get a grant from the authorization server.
+	 * 
+	 * @param  string  $grant
+	 * @return \Dingo\OAuth2\Grant\Grant
+	 */
+	public function getGrant($grant)
+	{
+		return $this->grants[$grant];
+	}
+
 }
