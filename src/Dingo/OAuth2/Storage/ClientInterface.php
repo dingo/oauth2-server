@@ -23,6 +23,14 @@ interface ClientInterface {
 	 * WHERE oauth_clients.id = :id
 	 * AND oauth_clients.secret = :secret
 	 * 
+	 * Example MySQL query when only the redirection URI is provided:
+	 * 
+	 * SELECT oauth_clients.*, oauth_client_endpoints.uri AS redirect_uri
+	 * FROM oauth_clients
+	 * INNER JOIN oauth_client_endpoints ON oauth_clients.id = oauth_client_endpoints.client_id
+	 * WHERE oauth_clients.id = :id
+	 * AND oauth_client_endpoints.uri = :redirectUri
+	 * 
 	 * Example MySQL query when no secret or redirection URI is provided:
 	 * 
 	 * SELECT oauth_clients.*

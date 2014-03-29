@@ -47,7 +47,20 @@ class Client extends PDO implements ClientInterface {
 			unset($bindings[':redirectUri']);
 		}
 
-		// Lastly we'll validate the client by comparing its ID.
+		// If only the clients redirection URI is given then we must correctly
+		// validate the client by comparing its ID and the redirection URI.
+		elseif (is_null($secret) and ! is_null($redirectUri))
+		{
+			$query = $this->connection->prepare(sprintf('SELECT %1$s.*, %2$s.uri AS redirect_uri
+				FROM %1$s
+				INNER JOIN %2$s ON %1$s.id = %2$s.client_id
+				WHERE %1$s.id = :id
+				AND %2$s.uri = :redirectUri', $this->tables['clients'], $this->tables['client_endpoints']));
+
+			unset($bindings[':secret']);
+		}
+
+		// Lastly we'll validate the client by comparing just the ID.
 		else
 		{
 			$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s
