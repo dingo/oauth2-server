@@ -8,6 +8,7 @@ class AuthorizationCode extends PDO implements AuthorizationCodeInterface {
 
 	/**
 	 * Insert an authorization code into storage.
+	 * 
 	 * @param  string  $code
 	 * @param  string  $clientId
 	 * @param  mixed  $userId
