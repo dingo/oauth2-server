@@ -56,7 +56,7 @@ abstract class Grant implements GrantInterface {
 		// Grab the redirection URI from the post data if there is one. This is
 		// sent along when validating a client for some grant types. It doesn't
 		// matter if we send along a "null" value though.
-		$redirectUri = $this->request->request->get('redirect_uri');
+		$redirectUri = $this->request->get('redirect_uri');
 
 		$id = $secret = null;
 
@@ -73,9 +73,9 @@ abstract class Grant implements GrantInterface {
 		// requests post data. It's preferred if clients use HTTP basic.
 		if ( ! $id or ! $secret)
 		{
-			$id = $this->request->request->get('client_id');
+			$id = $this->request->get('client_id');
 
-			$secret = $this->request->request->get('client_secret');
+			$secret = $this->request->get('client_secret');
 		}
 
 		// If we have a client ID and secret we'll attempt to verify the client by
