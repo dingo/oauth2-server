@@ -58,13 +58,16 @@ class AuthorizationCode extends Grant {
 	{
 		$this->validateRequestParameters(['client_id', 'client_secret', 'redirect_uri', 'code']);
 
-		$client = $this->validateConfidentialClient();
-
 		// Retrieve the code from the storage and perform some checks to ensure that
 		// the validated client above matches the client that the code was
 		// issued to. We'll also ensure that the redirection URIs match
 		// and that the code has not expired.
-		$code = $this->storage->get('authorization')->get($this->request->get('code'));
+		if ( ! $code = $this->storage->get('authorization')->get($this->request->get('code')))
+		{
+			throw new ClientException('The authorization code does not exist.', 400);
+		}
+
+		$client = $this->validateConfidentialClient();
 
 		if ($code->getClientId() != $client->getId())
 		{
