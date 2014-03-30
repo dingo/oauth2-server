@@ -35,7 +35,7 @@ class AuthorizationCode extends ResponseGrant {
 	 */
 	public function execute()
 	{
-		$this->validateRequestParameters(['client_id', 'client_secret', 'redirect_uri', 'code']);
+		$this->validateRequestParameters(['redirect_uri', 'code']);
 
 		// Retrieve the code from the storage and perform some checks to ensure that
 		// the validated client above matches the client that the code was

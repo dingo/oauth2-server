@@ -142,38 +142,8 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($this->getStorageMock());
 
 		// Replace the query string parameters so that the missing parameter
-		// is the "client_id".
-		$request->query->replace(['client_secret' => 'test', 'redirect_uri' => 'test', 'code' => 'test']);
-
-		try
-		{
-			$grant->execute();
-
-			$this->fail('Exception was not thrown when there is no "client_id" parameter in query string.');
-		}
-		catch (Dingo\OAuth2\Exception\ClientException $e)
-		{
-			$this->assertEquals('The request is missing the "client_id" parameter.', $e->getMessage());
-		}
-
-		// Replace the query string parameters so that the missing parameter
-		// is the "client_secret".
-		$request->query->replace(['client_id' => 'test', 'redirect_uri' => 'test', 'code' => 'test']);
-
-		try
-		{
-			$grant->execute();
-
-			$this->fail('Exception was not thrown when there is no "client_secret" parameter in query string.');
-		}
-		catch (Dingo\OAuth2\Exception\ClientException $e)
-		{
-			$this->assertEquals('The request is missing the "client_secret" parameter.', $e->getMessage());
-		}
-
-		// Replace the query string parameters so that the missing parameter
 		// is the "redirect_uri".
-		$request->query->replace(['client_secret' => 'test', 'client_id' => 'test', 'code' => 'test']);
+		$request->query->replace(['code' => 'test']);
 
 		try
 		{
@@ -188,7 +158,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 
 		// Replace the query string parameters so that the missing parameter
 		// is the "code".
-		$request->query->replace(['client_secret' => 'test', 'client_id' => 'test', 'redirect_uri' => 'test']);
+		$request->query->replace(['redirect_uri' => 'test']);
 
 		try
 		{
