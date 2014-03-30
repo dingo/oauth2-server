@@ -8,6 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 class GrantImplicitTest extends PHPUnit_Framework_TestCase {
 
 
+	public function tearDown()
+	{
+		m::close();
+	}
+
 
 	public function testHandlingAuthorizationRequestReturnsTokenEntity()
 	{
