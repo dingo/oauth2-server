@@ -89,4 +89,14 @@ abstract class Entity {
 		return json_encode($this->attributes);
 	}
 
+	/**
+	 * Get the entities attributes.
+	 * 
+	 * @return array
+	 */
+	public function getAttributes()
+	{
+		return $this->attributes;
+	}
+
 }
