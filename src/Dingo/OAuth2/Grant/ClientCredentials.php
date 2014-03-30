@@ -15,18 +15,7 @@ class ClientCredentials extends Grant {
 
 		$scopes = $this->validateScopes();
 
-		// Generate and create a new access token. Once the token has been generated and
-		// saved with the storage adapter we can return our array response.
-		$expires = time() + $this->accessTokenExpiration;
-
-		$token = $this->storage->get('token')->create($this->generateToken(), 'access', $client->getId(), null, $expires);
-
-		if ($scopes)
-		{
-			$this->storage->get('token')->associateScopes($token->getToken(), $scopes);
-
-			$token->attachScopes($scopes);
-		}
+		$token = $this->createToken('access', $client->getId(), null, $scopes);
 
 		return $token;
 	}
