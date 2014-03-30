@@ -89,6 +89,33 @@ abstract class Grant implements GrantInterface {
 	}
 
 	/**
+	 * Validate a public client by checking the client ID and the
+	 * redirection URI.
+	 * 
+	 * @return \Dingo\OAuth2\Entity\Client
+	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 */
+	public function validatePublicClient()
+	{
+		// When validating a public client the redirection URI is a required
+		// parameter. We will get the redirection URI and the clients ID
+		// from the request body to validate the public client.
+		$redirectUri = $this->request->get('redirect_uri');
+
+		$id = $this->request->get('client_id');
+
+		// When fetching the client from storage we pass "null" as the client
+		// secret because we want to match the redirection URI to the client
+		// ID to assert that the redirection URI is valid.
+		if ($client = $this->storage->get('client')->get($id, null, $redirectUri))
+		{
+			return $client;
+		}
+
+		throw new ClientException('The redirection URI is not registered to the client.', 401);
+	}
+
+	/**
 	 * Validate the requested scopes.
 	 * 
 	 * @param  array  $originalScopes

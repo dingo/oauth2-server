@@ -2,33 +2,12 @@
 
 use Dingo\OAuth2\Exception\ClientException;
 
-class AuthorizationCode extends Grant {
+class AuthorizationCode extends ResponseGrant {
 
 	/**
-	 * Validate an authorization request by checking for required parameters
-	 * as well as validating the client and scopes.
-	 * 
-	 * @return array
-	 */
-	public function validateAuthorizationRequest()
-	{
-		$this->validateRequestParameters(['response_type', 'client_id', 'redirect_uri']);
-
-		if ( ! $client = $this->storage->get('client')->get($this->request->get('client_id'), null, $this->request->get('redirect_uri', null)))
-		{
-			throw new ClientException('The client failed to authenticate.', 401);
-		}
-
-		$scopes = $this->validateScopes();
-
-		$parameters = array_merge($this->request->query->all(), compact('scopes', 'client'));
-
-		return $parameters;
-	}
-
-	/**
-	 * Create an authorization code. This code has a short expiration time of
-	 * 10 minutes which cannot be changed.
+	 * Handle the authorization request by creating an authorization code.
+	 * This code has a short expiration time of 10 minutes which
+	 * cannot be changed.
 	 * 
 	 * @param  string  $clientId
 	 * @param  mixed  $userId
@@ -36,7 +15,7 @@ class AuthorizationCode extends Grant {
 	 * @param  array  $scopes
 	 * @return \Dingo\OAuth2\Entity\AuthorizationCode
 	 */
-	public function createAuthorizationCode($clientId, $userId, $redirectUri, array $scopes)
+	public function handleAuthorizationRequest($clientId, $userId, $redirectUri, array $scopes)
 	{
 		$expires = time() + 600;
 

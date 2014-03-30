@@ -1,11 +1,14 @@
 <?php namespace Dingo\OAuth2\Server;
 
+use RuntimeException;
+use Dingo\OAuth2\Entity\Entity;
 use Dingo\OAuth2\ScopeValidator;
 use Dingo\OAuth2\Storage\Adapter;
 use Dingo\OAuth2\Grant\GrantInterface;
 use Dingo\OAuth2\Exception\ClientException;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Symfony\Component\HttpFoundation\Request;
+use Dingo\OAuth2\Entity\AuthorizationCode as AuthorizationCodeEntity;
 
 class Authorization {
 
@@ -111,7 +114,7 @@ class Authorization {
 
 		if ($grant->getResponseType())
 		{
-			$this->responseTypes[] = $grant->getResponseType();
+			$this->responseTypes[$grant->getResponseType()] = $key;
 		}
 
 		return $this;
@@ -154,7 +157,7 @@ class Authorization {
 
 		$accessToken = $this->grants[$grant]->execute();
 
-		$response = $this->makeResponseFromToken($accessToken);
+		$response = $this->makeResponseFromEntity($accessToken);
 
 		// If the "refresh" grant has been registered we'll issue a refresh token
 		// so that clients can easily renew their access tokens.
@@ -163,6 +166,13 @@ class Authorization {
 			$refreshToken = $this->issueRefreshToken($accessToken);
 
 			$response['refresh_token'] = $refreshToken;
+		}
+
+		// When making a response from an entity we may get some optional
+		// parameters. We'll simply unset these if they exist.
+		foreach (['scope', 'state'] as $optional)
+		{
+			if (isset($response[$optional])) unset($response[$optional]);
 		}
 
 		return $response;
@@ -188,62 +198,95 @@ class Authorization {
 	}
 
 	/**
-	 * Make an array response from an access token.
+	 * Make an array response from an entity.
 	 * 
-	 * @param  \Dingo\OAuth2\Entity\Token  $accessToken
+	 * @param  \Dingo\OAuth2\Entity\Entity  $entity
 	 * @return array
 	 */
-	protected function makeResponseFromToken(TokenEntity $accessToken)
+	protected function makeResponseFromEntity(Entity $entity)
 	{
-		return [
-			'access_token' => $accessToken->getToken(),
-			'token_type'   => 'Bearer',
-			'expires'      => $accessToken->getExpires(),
-			'expires_in'   => $this->accessTokenExpiration
-		];
+		if ($entity instanceof TokenEntity)
+		{
+			$response = [
+				'access_token' => $entity->getToken(),
+				'token_type'   => 'Bearer',
+				'expires'      => $entity->getExpires(),
+				'expires_in'   => $this->accessTokenExpiration
+			];
+		}
+		elseif ($entity instanceof AuthorizationCodeEntity)
+		{
+			$response = ['code' => $entity->getCode()];
+		}
+
+		// If the request had a state parameter then we'll return the exact
+		// same state parameter so the client can validate it.
+		if ($this->request->get('state'))
+		{
+			$response['state'] = $this->request->get('state');
+		}
+
+		// If the entity has any scopes then we'll build a scope string from
+		// keys of the scopes using the scope delimiter that should've been
+		// used in the initial request.
+		if ($scopes = $entity->getScopes())
+		{
+			$response['scope'] = implode($this->getScopeValidator()->getScopeDelimiter(), array_keys($scopes));
+		}
+
+		return $response;
 	}
 
 	/**
-	 * Validate an authorization request. This performs a few prior checks
-	 * before handing the heavy lifitng off to the authorization code
-	 * grant.
+	 * Validate an authorization request.
 	 * 
 	 * @return array
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
 	public function validateAuthorizationRequest()
 	{
-		if ( ! isset($this->grants['authorization_code']))
-		{
-			throw new ClientException('The authorization code grant is not registered with the authorization server.', 400);
-		}
-
-		if ( ! in_array($this->request->get('response_type'), $this->responseTypes))
+		if ( ! isset($this->responseTypes[$this->request->get('response_type')]))
 		{
 			throw new ClientException('The authorization server does not recognize the provided response type.', 400);
 		}
 
-		return $this->grants['authorization_code']->validateAuthorizationRequest();
+		$key = $this->responseTypes[$this->request->get('response_type')];
+
+		return $this->grants[$key]->validateAuthorizationRequest();
 	}
 
 	/**
-	 * Create an authorization code.
+	 * Handle an authorization request. Depending on the response type
+	 * this will either use the Authorization Code Grant or the
+	 * Implicit Grant.
 	 * 
 	 * @param  string  $clientId
 	 * @param  mixed  $userId
 	 * @param  string  $redirectUri
 	 * @param  array  $scopes
-	 * @return \Dingo\OAuth2\Entity\AuthorizationCode
-	 * @throws \Dingo\OAuth2\Exception\ClientException
+	 * @return array
 	 */
-	public function createAuthorizationCode($clientId, $userId, $redirectUri, array $scopes)
+	public function handleAuthorizationRequest($clientId, $userId, $redirectUri, array $scopes)
 	{
-		if ( ! isset($this->grants['authorization_code']))
-		{
-			throw new ClientException('The authorization server does not support the requested grant.', 400);
-		}
+		$key = $this->responseTypes[$this->request->get('response_type')];
 
-		return $this->grants['authorization_code']->createAuthorizationCode($clientId, $userId, $redirectUri, $scopes);
+		$entity = $this->grants[$key]->handleAuthorizationRequest($clientId, $userId, $redirectUri, $scopes);
+
+		return $this->makeResponseFromEntity($entity);
+	}
+
+	/**
+	 * Make a redirection URI from a response array created by the
+	 * makeResponseFromEntity method.
+	 * 
+	 * @param  array  $response
+	 * @return string
+	 */
+	public function makeRedirectUri(array $response)
+	{
+		$separator = $this->request->get('response_type') == 'code' ? '?' : '#';
+
+		return $this->request->get('redirect_uri').$separator.http_build_query($response);
 	}
 
 	/**

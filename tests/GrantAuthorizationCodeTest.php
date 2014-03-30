@@ -71,9 +71,9 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException \Dingo\OAuth2\Exception\ClientException
-	 * @expectedExceptionMessage The client failed to authenticate.
+	 * @expectedExceptionMessage The redirection URI is not registered to the client.
 	 */
-	public function testValidatingAuthorizationRequestFailsWhenClientIsInvalid()
+	public function testValidatingAuthorizationRequestFailsWhenPublicClientIsInvalid()
 	{
 		$grant = new AuthorizationCode;
 
@@ -109,7 +109,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreateAuthorizationCodeReturnsAuthorizationCodeEntity()
+	public function testHandlingAuthorizationRequestReturnsAuthorizationCodeEntity()
 	{
 		$grant = (new AuthorizationCode)->setStorage($storage = $this->getStorageMock());
 
@@ -120,7 +120,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 			'associateScopes' => true
 		]));
 
-		$code = $grant->createAuthorizationCode('test', 1, 'test', []);
+		$code = $grant->handleAuthorizationRequest('test', 1, 'test', []);
 
 		$this->assertEquals([
 			'code' => 'test',
@@ -355,11 +355,18 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testGettersReturnCorrectValues()
+	public function testCorrectGrantIdentifier()
 	{
 		$grant = new AuthorizationCode;
 
 		$this->assertEquals('authorization_code', $grant->getGrantIdentifier());
+	}
+
+
+	public function testCorrectResponseType()
+	{
+		$grant = new AuthorizationCode;
+
 		$this->assertEquals('code', $grant->getResponseType());
 	}
 

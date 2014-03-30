@@ -132,6 +132,16 @@ class ScopeValidator {
 	}
 
 	/**
+	 * Get the scope delimiter.
+	 * 
+	 * @return string
+	 */
+	public function getScopeDelimiter()
+	{
+		return $this->scopeDelimiter;
+	}
+
+	/**
 	 * Set the default scope.
 	 * 
 	 * @param  string|array  $defaultScope

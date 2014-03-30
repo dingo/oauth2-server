@@ -4,6 +4,7 @@ use Mockery as m;
 use Dingo\OAuth2\Server\Authorization;
 use Symfony\Component\HttpFoundation\Request;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
+use Dingo\OAuth2\Entity\AuthorizationCode as AuthorizationCodeEntity;
 
 class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 
@@ -150,28 +151,47 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	/**
-	 * @expectedException \Dingo\OAuth2\Exception\ClientException
-	 */
-	public function testCreateAuthorizationCodeFailsWhenAuthorizationGrantNotRegistered()
+	public function testHandlingAuthorizationRequestSucceeds()
 	{
 		$storage = $this->getStorageMock();
 
-		$authorization = new Authorization($storage);
-
-		$authorization->createAuthorizationCode('testclient', 1, 'test', []);
-	}
-
-
-	public function testCreateAuthorizationCodeSucceeds()
-	{
-		$storage = $this->getStorageMock();
-
-		$authorization = new Authorization($storage);
+		$authorization = new Authorization($storage, Request::create('test', 'GET', ['response_type' => 'code', 'state' => 'teststate']));
 
 		$authorization->registerGrant(new AuthorizationCodeGrantStub);
 
-		$this->assertTrue($authorization->createAuthorizationCode('testclient', 1, 'test', []));
+		$this->assertEquals([
+			'code' => 'test',
+			'state' => 'teststate',
+			'scope' => 'testscope'
+		], $authorization->handleAuthorizationRequest('testclient', 1, 'test', ['testscope' => true]));
+	}
+
+
+	public function testMakeRedirectUriWithQueryString()
+	{
+		$authorization = new Authorization($this->getStorageMock(), Request::create('test', 'GET', [
+			'redirect_uri' => 'foo.com/bar',
+			'response_type' => 'code'
+		]));
+
+		$this->assertEquals('foo.com/bar?code=12345&scope=foo', $authorization->makeRedirectUri([
+			'code' => '12345',
+			'scope' => 'foo'
+		]));
+	}
+
+
+	public function testMakeRedirectUriWithFragment()
+	{
+		$authorization = new Authorization($this->getStorageMock(), Request::create('test', 'GET', [
+			'redirect_uri' => 'foo.com/bar',
+			'response_type' => 'token'
+		]));
+
+		$this->assertEquals('foo.com/bar#access_token=12345&scope=foo', $authorization->makeRedirectUri([
+			'access_token' => '12345',
+			'scope' => 'foo'
+		]));
 	}
 
 
@@ -223,9 +243,12 @@ class AuthorizationCodeGrantStub extends Dingo\OAuth2\Grant\Grant {
 		return true;
 	}
 
-	public function createAuthorizationCode($clientId, $userId, $redirectUri, $scopes)
+	public function handleAuthorizationRequest($clientId, $userId, $redirectUri, $scopes)
 	{
-		return true;
+		$code = new AuthorizationCodeEntity('test', $clientId, $userId, $redirectUri, strtotime(date('31/01/1991 12:00 PM')));
+		$code->attachScopes($scopes);
+
+		return $code;
 	}
 
 	public function getResponseType()
