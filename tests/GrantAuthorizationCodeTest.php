@@ -116,13 +116,20 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		// Set up the expectations so that when the create method is
 		// called an AuthorizationCode entity is returned.
 		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([
-			'create' => new AuthorizationCodeEntity('test', 'test', 1, 'test', time() + 120),
+			'create' => new AuthorizationCodeEntity('test', 'test', 1, 'test', $expires = time() + 120),
 			'associateScopes' => true
 		]));
 
 		$code = $grant->createAuthorizationCode('test', 1, 'test', []);
 
-		$this->assertEquals('test', $code->getCode());
+		$this->assertEquals([
+			'code' => 'test',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'redirect_uri' => 'test',
+			'expires' => $expires,
+			'scopes' => []
+		], $code->getAttributes());
 	}
 
 
@@ -329,13 +336,31 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		]));
 
 		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
-			'create' => new TokenEntity('test', 'access', 'test', 1, time() + 120),
+			'create' => new TokenEntity('test', 'access', 'test', 1, $expires = time() + 120),
 			'associateScopes' => true
 		]));
 
 		$token = $grant->execute();
 
-		$this->assertEquals('test', $token->getToken());
+		$this->assertEquals([
+			'token' => 'test',
+			'type' => 'access',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'expires' => $expires,
+			'scopes' => [
+				'test' => true
+			]
+		], $token->getAttributes());
+	}
+
+
+	public function testGettersReturnCorrectValues()
+	{
+		$grant = new AuthorizationCode;
+
+		$this->assertEquals('authorization_code', $grant->getGrantIdentifier());
+		$this->assertEquals('code', $grant->getResponseType());
 	}
 
 
