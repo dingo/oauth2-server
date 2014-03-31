@@ -1,6 +1,5 @@
 <?php
 
-use Mockery as m;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 use Dingo\OAuth2\Storage\PDO\Token as TokenStorage;
