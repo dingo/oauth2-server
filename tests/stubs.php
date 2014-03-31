@@ -90,3 +90,8 @@ class AdapterStub extends Dingo\OAuth2\Storage\Adapter {
 
 
 }
+
+
+class ScopeableEntityStub extends Dingo\OAuth2\Entity\ScopeableEntity {
+	
+}
