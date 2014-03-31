@@ -81,9 +81,7 @@ class Client extends PDO implements ClientInterface {
 			$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s 
 				WHERE %1$s.client_id = :client_id AND is_default = 1 LIMIT 1', $this->tables['client_endpoints']));
 
-			$query->execute([':client_id' => $client['id']]);
-
-			if ($endpoint = $query->fetch())
+			if ($query->execute([':client_id' => $client['id']]) and $endpoint = $query->fetch())
 			{
 				$client['redirect_uri'] = $endpoint['uri'];
 			}
