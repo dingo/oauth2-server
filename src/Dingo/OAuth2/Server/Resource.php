@@ -95,6 +95,13 @@ class Resource {
 
 				return $token;
 			}
+
+			if (preg_match('/Basic (\S+)/', $header, $matches))
+			{
+				list($header, $token) = $matches;
+
+				return rtrim(base64_decode($token), ":");
+			}
 		}
 		elseif ($this->request->get('access_token'))
 		{

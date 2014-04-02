@@ -14,6 +14,21 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCanGetAccessTokenFromBasicHeaders()
+	{
+		$request = Request::create('foo', 'POST');
+
+		$authorization = 'Basic ' . base64_encode('12345');
+
+		$request->headers->set('authorization', $authorization);
+
+		$storage = $this->getStorageMock();
+
+		$resource = new Resource($storage, $request);
+
+		$this->assertEquals('12345', $resource->getAccessToken());
+	}
+
 	public function testCanGetAccessTokenFromHeaders()
 	{
 		$request = Request::create('foo', 'POST');
@@ -25,7 +40,6 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('12345', $resource->getAccessToken());
 	}
-
 
 	public function testCanGetAccessTokenFromPostRequestBody()
 	{
