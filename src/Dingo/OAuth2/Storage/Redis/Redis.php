@@ -125,7 +125,7 @@ abstract class Redis {
 
 		// We'll spin through each item on the array and attempt to decode
 		// any JSON so that we get the proper array representations.
-		return array_map(function($item)
+		return $this->cache[$key] = array_map(function($item)
 		{
 			if (is_string($item) and $decoded = json_decode($item, true))
 			{
