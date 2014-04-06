@@ -18,12 +18,17 @@ class Token extends Redis implements TokenInterface {
 	 */
 	public function create($token, $type, $clientId, $userId, $expires)
 	{
-		$this->setValue($token, $this->tables['tokens'], [
+		$payload = [
 			'type'      => $type,
 			'client_id' => $clientId,
 			'user_id'   => $userId,
 			'expires'   => $expires
-		]);
+		];
+		
+		if ( ! $this->setValue($token, $this->tables['tokens'], $payload))
+		{
+			return false;
+		}
 
 		return new TokenEntity($token, $type, $clientId, $userId, $expires);
 	}

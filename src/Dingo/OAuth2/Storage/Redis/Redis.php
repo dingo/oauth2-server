@@ -63,9 +63,12 @@ abstract class Redis {
 			return $this->cache[$key];
 		}
 
-		$value = $this->redis->get($key);
+		if ( ! $value = $this->redis->get($key))
+		{
+			return false;
+		}
 
-		return $this->cache[$key] = ($decoded = json_decode($value, true) ? $decoded : $value);
+		return $this->cache[$key] = (is_string($value) and $decoded = json_decode($value, true)) ? $decoded : $value;
 	}
 
 	/**
@@ -124,7 +127,7 @@ abstract class Redis {
 		// any JSON so that we get the proper array representations.
 		return array_map(function($item)
 		{
-			if ($decoded = json_decode($item, true))
+			if (is_string($item) and $decoded = json_decode($item, true))
 			{
 				return $decoded;
 			}
