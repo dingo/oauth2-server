@@ -44,7 +44,7 @@ class Token extends Redis implements TokenInterface {
 	{
 		foreach ($scopes as $scope)
 		{
-			$this->pushList($token, $this->tables['token_scopes'], [
+			$this->pushSet($token, $this->tables['token_scopes'], [
 				'scope'       => $scope->getScope(),
 				'name'        => $scope->getName(),
 				'description' => $scope->getDescription()
@@ -83,7 +83,7 @@ class Token extends Redis implements TokenInterface {
 
 		$scopes = [];
 
-		foreach ($this->getList($token->getToken(), $this->tables['token_scopes']) as $scope)
+		foreach ($this->getSet($token->getToken(), $this->tables['token_scopes']) as $scope)
 		{
 			$scopes[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
 		}

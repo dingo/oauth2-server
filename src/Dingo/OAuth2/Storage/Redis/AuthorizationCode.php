@@ -44,7 +44,7 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 	{
 		foreach ($scopes as $scope)
 		{
-			$this->pushList($code, $this->tables['authorization_code_scopes'], [
+			$this->pushSet($code, $this->tables['authorization_code_scopes'], [
 				'scope'       => $scope->getScope(),
 				'name'        => $scope->getName(),
 				'description' => $scope->getDescription()
@@ -69,7 +69,7 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 
 		$scopes = [];
 
-		foreach ($this->getList($code->getCode(), $this->tables['authorization_code_scopes']) as $scope)
+		foreach ($this->getSet($code->getCode(), $this->tables['authorization_code_scopes']) as $scope)
 		{
 			$scopes[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
 		}

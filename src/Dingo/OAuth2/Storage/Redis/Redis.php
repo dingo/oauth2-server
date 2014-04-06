@@ -89,14 +89,14 @@ abstract class Redis {
 	}
 
 	/**
-	 * Push a value onto a list.
+	 * Push a value onto a set.
 	 * 
 	 * @param  string  $key
 	 * @param  string  $table
 	 * @param  mixed  $value
 	 * @return int
 	 */
-	public function pushList($key, $table, $value)
+	public function pushSet($key, $table, $value)
 	{
 		$key = $this->prefix($key, $table);
 
@@ -107,17 +107,17 @@ abstract class Redis {
 
 		array_push($this->cache[$key], $value);
 
-		return $this->redis->rpush($key, $this->prepareValue($value));
+		return $this->redis->sadd($key, $this->prepareValue($value));
 	}
 
 	/**
-	 * Get a list from the Redis store.
+	 * Get a set from the Redis store.
 	 * 
 	 * @param  string  $key
 	 * @param  string  $table
 	 * @return array
 	 */
-	public function getList($key, $table)
+	public function getSet($key, $table)
 	{
 		$key = $this->prefix($key, $table);
 
@@ -126,7 +126,7 @@ abstract class Redis {
 			return $this->cache[$key];
 		}
 
-		$list = $this->redis->lrange($key, 0, -1);
+		$list = $this->redis->smembers($key);
 
 		// We'll spin through each item on the array and attempt to decode
 		// any JSON so that we get the proper array representations.
