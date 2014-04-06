@@ -9,7 +9,8 @@
         }
     ],
     "require": {
-        "symfony/http-foundation": "2.4.*"
+        "symfony/http-foundation": "2.4.*",
+        "predis/predis": "0.8.*"
     },
     "require-dev": {
         "mockery/mockery": "0.9.*"
