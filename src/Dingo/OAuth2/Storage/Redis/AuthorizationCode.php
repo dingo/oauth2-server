@@ -18,12 +18,17 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 	 */
 	public function create($code, $clientId, $userId, $redirectUri, $expires)
 	{
-		$this->setValue($code, $this->tables['authorization_codes'], [
+		$payload = [
 			'client_id'    => $clientId,
 			'user_id'      => $userId,
 			'redirect_uri' => $redirectUri,
 			'expires'      => $expires
-		]);
+		];
+
+		if ( ! $this->setValue($code, $this->tables['authorization_codes'], $payload))
+		{
+			return false;
+		}
 
 		return new AuthorizationCodeEntity($code, $clientId, $userId, $redirectUri, $expires);
 	}
