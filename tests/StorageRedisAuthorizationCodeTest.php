@@ -52,8 +52,8 @@ class StorageRedisAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new AuthorizationCodeStorage($this->redis, ['authorization_code_scopes' => 'authorization_code_scopes']);
 
-		$this->redis->shouldReceive('rpush')->once()->with('authorization:code:scopes:test', '{"scope":"foo","name":"foo","description":"foo"}')->andReturn(true);
-		$this->redis->shouldReceive('rpush')->once()->with('authorization:code:scopes:test', '{"scope":"bar","name":"bar","description":"bar"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('authorization:code:scopes:test', '{"scope":"foo","name":"foo","description":"foo"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('authorization:code:scopes:test', '{"scope":"bar","name":"bar","description":"bar"}')->andReturn(true);
 
 		$storage->associateScopes('test', [
 			'foo' => new ScopeEntity('foo', 'foo', 'foo'),
@@ -81,7 +81,7 @@ class StorageRedisAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		]);
 
 		$this->redis->shouldReceive('get')->once()->with('authorization:codes:test')->andReturn('{"client_id":"test","user_id":1,"redirect_uri":"test","expires":1}');
-		$this->redis->shouldReceive('lrange')->once()->with('authorization:code:scopes:test', 0, -1)->andReturn([
+		$this->redis->shouldReceive('smembers')->once()->with('authorization:code:scopes:test')->andReturn([
 			'{"scope":"foo","name":"foo","description":"foo"}',
 			'{"scope":"bar","name":"bar","description":"bar"}'
 		]);

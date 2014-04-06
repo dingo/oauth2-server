@@ -53,8 +53,8 @@ class StorageRedisTokenTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new TokenStorage($this->redis, ['token_scopes' => 'token_scopes']);
 
-		$this->redis->shouldReceive('rpush')->once()->with('token:scopes:test', '{"scope":"foo","name":"foo","description":"foo"}')->andReturn(true);
-		$this->redis->shouldReceive('rpush')->once()->with('token:scopes:test', '{"scope":"bar","name":"bar","description":"bar"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('token:scopes:test', '{"scope":"foo","name":"foo","description":"foo"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('token:scopes:test', '{"scope":"bar","name":"bar","description":"bar"}')->andReturn(true);
 
 		$storage->associateScopes('test', [
 			'foo' => new ScopeEntity('foo', 'foo', 'foo'),
@@ -112,7 +112,7 @@ class StorageRedisTokenTest extends PHPUnit_Framework_TestCase {
 
 		$this->redis->shouldReceive('get')->once()->with('tokens:test')->andReturn('{"type":"access","client_id":"test","user_id":1,"expires":1}');
 
-		$this->redis->shouldReceive('lrange')->once()->with('token:scopes:test', 0, -1)->andReturn([
+		$this->redis->shouldReceive('smembers')->once()->with('token:scopes:test')->andReturn([
 			'{"scope":"foo","name":"foo","description":"foo"}',
 			'{"scope":"bar","name":"bar","description":"bar"}'
 		]);

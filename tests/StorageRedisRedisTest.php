@@ -45,24 +45,24 @@ class StorageRedisRedisTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testGetValueFromListTwicePullsFromCacheOnSecondTime()
+	public function testGetValueFromSetTwicePullsFromCacheOnSecondTime()
 	{
-		$this->redis->shouldReceive('lrange')->once()->with('test:foo', 0, -1)->andReturn(['bar']);
+		$this->redis->shouldReceive('smembers')->once()->with('test:foo')->andReturn(['bar']);
 
-		$this->assertEquals(['bar'], $this->storage->getList('foo', 'test'));
-		$this->assertEquals(['bar'], $this->storage->getList('foo', 'test'));
+		$this->assertEquals(['bar'], $this->storage->getSet('foo', 'test'));
+		$this->assertEquals(['bar'], $this->storage->getSet('foo', 'test'));
 	}
 
 
-	public function testPushValueOntoListThenGettingValuePullsFromCache()
+	public function testPushValueOntoSetThenGettingValuePullsFromCache()
 	{
-		$this->redis->shouldReceive('rpush')->once()->with('test:foo', 'bar')->andReturn(true);
-		$this->redis->shouldReceive('rpush')->once()->with('test:foo', 'baz')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('test:foo', 'bar')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('test:foo', 'baz')->andReturn(true);
 
-		$this->storage->pushList('foo', 'test', 'bar');
-		$this->storage->pushList('foo', 'test', 'baz');
+		$this->storage->pushSet('foo', 'test', 'bar');
+		$this->storage->pushSet('foo', 'test', 'baz');
 
-		$this->assertEquals(['bar', 'baz'], $this->storage->getList('foo', 'test'));
+		$this->assertEquals(['bar', 'baz'], $this->storage->getSet('foo', 'test'));
 	}
 
 
