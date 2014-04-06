@@ -100,7 +100,7 @@ abstract class Redis {
 	{
 		$key = $this->prefix($key, $table);
 
-		$this->cache[$key][] = $value;
+		array_push($this->cache[$key], $value);
 
 		return $this->redis->rpush($key, $this->prepareValue($value));
 	}
