@@ -36,7 +36,7 @@ class StoragePDOAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreateAuthorizationCodeEntitySucceedsAndReturnsTokenEntity()
+	public function testCreateAuthorizationCodeEntitySucceedsAndReturnsAuthorizationCodeEntity()
 	{
 		$storage = new AuthorizationCodeStorage($this->pdo, ['authorization_codes' => 'authorization_codes']);
 
