@@ -20,9 +20,14 @@ class Client extends Redis implements ClientInterface {
 			return false;
 		}
 
-		$client['redirect_uri'] = $this->getMatchingMember($id, $this->tables['client_endpoints'], function($uri) use ($redirectUri)
+		// Attempt to grab a redirection URI from the storage that matches the
+		// supplied redirection URI. If we can't find a match then we'll set
+		// this it as "null" for the time being.
+		$client['redirect_uri'] = $this->getMatchingMember($id, $this->tables['client_endpoints'], function($endpoint) use ($redirectUri)
 		{
-			return $uri == $redirectUri ? $uri : null;
+			$endpoint = json_decode($endpoint, true);
+
+			return $endpoint['uri'] == $redirectUri ? $endpoint['uri'] : null;
 		});
 
 		// If a secret and redirection URI were given then we must correctly
@@ -69,7 +74,7 @@ class Client extends Redis implements ClientInterface {
 			});
 		}
 
-		return new ClientEntity($id, $secret, $client['name'], $client['redirect_uri']);
+		return new ClientEntity($id, $client['secret'], $client['name'], $client['redirect_uri']);
 	}
 
 }
