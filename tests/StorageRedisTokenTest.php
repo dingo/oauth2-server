@@ -30,11 +30,25 @@ class StorageRedisTokenTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCreateAuthorizationCodeEntitySucceedsButFailsToPushTokenToSetAndReturnsFalse()
+	{
+		$storage = new TokenStorage($this->redis, ['tokens' => 'tokens', 'token_scopes' => 'token_scopes']);
+
+		$this->redis->shouldReceive('set')->once()->with('tokens:test', '{"type":"access","client_id":"test","user_id":1,"expires":1}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('tokens', 'test')->andReturn(false);
+		$this->redis->shouldReceive('del')->once()->with('tokens:test')->andReturn(true);
+		$this->redis->shouldReceive('del')->once()->with('token:scopes:test')->andReturn(true);
+
+		$this->assertFalse($storage->create('test', 'access', 'test', 1, 1));
+	}
+
+
 	public function testCreateTokenEntitySucceedsAndReturnsTokenEntity()
 	{
 		$storage = new TokenStorage($this->redis, ['tokens' => 'tokens']);
 
 		$this->redis->shouldReceive('set')->once()->with('tokens:test', '{"type":"access","client_id":"test","user_id":1,"expires":1}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('tokens', 'test')->andReturn(true);
 
 		$token = $storage->create('test', 'access', 'test', 1, 1);
 

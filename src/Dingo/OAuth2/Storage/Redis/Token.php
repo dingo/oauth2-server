@@ -30,6 +30,15 @@ class Token extends Redis implements TokenInterface {
 			return false;
 		}
 
+		// We'll also store the token in a "tokens" set so we can easily
+		// flush all tokens if need be.
+		if ( ! $this->pushSet(null, $this->tables['tokens'], $token))
+		{
+			$this->delete($token);
+
+			return false;
+		}
+
 		return new TokenEntity($token, $type, $clientId, $userId, $expires);
 	}
 

@@ -30,6 +30,15 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 			return false;
 		}
 
+		// We'll also store the authorization code in a "authorization codes"
+		// set so we can easily flush all authorization codes if need be.
+		if ( ! $this->pushSet(null, $this->tables['authorization_codes'], $code))
+		{
+			$this->delete($code);
+			
+			return false;
+		}
+
 		return new AuthorizationCodeEntity($code, $clientId, $userId, $redirectUri, $expires);
 	}
 

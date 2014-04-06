@@ -29,11 +29,25 @@ class StorageRedisAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCreateAuthorizationCodeEntitySucceedsButFailsToPushCodeToSetAndReturnsFalse()
+	{
+		$storage = new AuthorizationCodeStorage($this->redis, ['authorization_codes' => 'authorization_codes', 'authorization_code_scopes' => 'authorization_code_scopes']);
+
+		$this->redis->shouldReceive('set')->once()->with('authorization:codes:test', '{"client_id":"test","user_id":1,"redirect_uri":"test","expires":1}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('authorization:codes', 'test')->andReturn(false);
+		$this->redis->shouldReceive('del')->once()->with('authorization:codes:test')->andReturn(true);
+		$this->redis->shouldReceive('del')->once()->with('authorization:code:scopes:test')->andReturn(true);
+
+		$this->assertFalse($storage->create('test', 'test', 1, 'test', 1));
+	}
+
+
 	public function testCreateAuthorizationCodeEntitySucceedsAndReturnsAuthorizationCodeEntity()
 	{
 		$storage = new AuthorizationCodeStorage($this->redis, ['authorization_codes' => 'authorization_codes']);
 
 		$this->redis->shouldReceive('set')->once()->with('authorization:codes:test', '{"client_id":"test","user_id":1,"redirect_uri":"test","expires":1}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('authorization:codes', 'test')->andReturn(true);
 
 		$code = $storage->create('test', 'test', 1, 'test', 1);
 

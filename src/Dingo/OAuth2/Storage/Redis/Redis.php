@@ -212,7 +212,7 @@ abstract class Redis {
 	{
 		$table = str_replace('_', ':', $table);
 
-		return "{$table}:{$key}";
+		return trim("{$table}:{$key}", ':');
 	}
 
 }
