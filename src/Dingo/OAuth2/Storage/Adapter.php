@@ -5,6 +5,21 @@ use RuntimeException;
 abstract class Adapter {
 
 	/**
+	 * Array of tables used when interacting with database.
+	 * 
+	 * @var array
+	 */
+	protected $tables = [
+		'clients'                   => 'oauth_clients',
+		'client_endpoints'          => 'oauth_client_endpoints',
+		'tokens'                    => 'oauth_tokens',
+		'token_scopes'              => 'oauth_token_scopes',
+		'authorization_codes'       => 'oauth_authorization_codes',
+		'authorization_code_scopes' => 'oauth_authorization_code_scopes',
+		'scopes'                    => 'oauth_scopes'
+	];
+
+	/**
 	 * Array of storage instances for adapter.
 	 * 
 	 * @var array
@@ -72,6 +87,19 @@ abstract class Adapter {
 		}
 
 		throw new RuntimeException("Storage driver [{$storage}] is not supported.");
+	}
+
+	/**
+	 * Set the tables to be used by storages.
+	 * 
+	 * @param  array  $tables
+	 * @return \Dingo\OAuth2\Storage\Adapter
+	 */
+	public function setTables(array $tables)
+	{
+		$this->tables = array_merge($this->tables, $tables);
+
+		return $this;
 	}
 
 }

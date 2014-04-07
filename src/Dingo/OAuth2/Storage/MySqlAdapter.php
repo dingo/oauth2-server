@@ -16,21 +16,6 @@ class MySqlAdapter extends Adapter {
 	protected $connection;
 
 	/**
-	 * Array of tables used when interacting with database.
-	 * 
-	 * @var array
-	 */
-	protected $tables = [
-		'clients'                   => 'oauth_clients',
-		'client_endpoints'          => 'oauth_client_endpoints',
-		'tokens'                    => 'oauth_tokens',
-		'token_scopes'              => 'oauth_token_scopes',
-		'authorization_codes'       => 'oauth_authorization_codes',
-		'authorization_code_scopes' => 'oauth_authorization_code_scopes',
-		'scopes'                    => 'oauth_scopes'
-	];
-
-	/**
 	 * Create a new Dingo\OAuth2\Storage\MySqlAdapter instance.
 	 * 
 	 * @param  \PDO  $connection
