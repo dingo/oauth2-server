@@ -47,7 +47,7 @@ class Resource {
 	 * @return \Dingo\OAuth2\Entity\Token
 	 * @throws \Dingo\OAuth2\Exception\InvalidTokenException
 	 */
-	public function validate()
+	public function validateRequest()
 	{
 		if ( ! $token = $this->getAccessToken())
 		{

@@ -88,7 +88,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$resource->validate();
+		$resource->validateRequest();
 	}
 
 
@@ -105,7 +105,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$resource->validate();
+		$resource->validateRequest();
 	}
 
 
@@ -126,7 +126,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$resource->validate();
+		$resource->validateRequest();
 	}
 
 
@@ -143,7 +143,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$token = $resource->validate();
+		$token = $resource->validateRequest();
 
 		$this->assertEquals(12345, $token->getToken());
 	}
