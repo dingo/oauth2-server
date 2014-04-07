@@ -1,5 +1,9 @@
 ## Changes
 
+### 0.1.2
+
+- Switch to PSR-4 autoloading.
+
 ### 0.1.1 (April 8th, 2014)
 
 - Allow tables to be set on storage adapters during runtime.

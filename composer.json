@@ -21,8 +21,8 @@
         "predis/predis": "Predis is required to use the Redis storage adapter."
     },
     "autoload": {
-        "psr-0": {
-            "Dingo\\OAuth2": "src"
+        "psr-4": {
+            "Dingo\\OAuth2\\": "src"
         },
         "files": [
             "tests/stubs.php"
