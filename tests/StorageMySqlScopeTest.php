@@ -1,9 +1,9 @@
 <?php
 
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
-use Dingo\OAuth2\Storage\PDO\Scope as ScopeStorage;
+use Dingo\OAuth2\Storage\MySql\Scope as ScopeStorage;
 
-class StoragePDOScopeTest extends PHPUnit_Framework_TestCase {
+class StorageMySqlScopeTest extends PHPUnit_Framework_TestCase {
 
 
 	public function setUp()

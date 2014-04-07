@@ -1,8 +1,8 @@
-<?php namespace Dingo\OAuth2\Storage\PDO;
+<?php namespace Dingo\OAuth2\Storage\MySql;
 
-use PDO as Connection;
+use PDO;
 
-abstract class PDO {
+abstract class MySql {
 
 	/**
 	 * PDO connection instance.
@@ -19,13 +19,13 @@ abstract class PDO {
 	protected $tables;
 
 	/**
-	 * Create a new Dingo\OAuth2\Storage\PDO\PDO instance.
+	 * Create a new Dingo\OAuth2\Storage\MySql\MySql instance.
 	 * 
 	 * @param  \PDO  $connection
 	 * @param  array  $tables
 	 * @return void
 	 */
-	public function __construct(Connection $connection, array $tables)
+	public function __construct(PDO $connection, array $tables)
 	{
 		$this->connection = $connection;
 		$this->tables = $tables;

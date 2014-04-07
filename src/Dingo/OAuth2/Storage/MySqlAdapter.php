@@ -1,12 +1,12 @@
 <?php namespace Dingo\OAuth2\Storage;
 
 use PDO;
-use Dingo\OAuth2\Storage\PDO\Scope;
-use Dingo\OAuth2\Storage\PDO\Token;
-use Dingo\OAuth2\Storage\PDO\Client;
-use Dingo\OAuth2\Storage\PDO\AuthorizationCode;
+use Dingo\OAuth2\Storage\MySql\Scope;
+use Dingo\OAuth2\Storage\MySql\Token;
+use Dingo\OAuth2\Storage\MySql\Client;
+use Dingo\OAuth2\Storage\MySql\AuthorizationCode;
 
-class PdoAdapter extends Adapter {
+class MySqlAdapter extends Adapter {
 
 	/**
 	 * PDO connection.
@@ -31,7 +31,7 @@ class PdoAdapter extends Adapter {
 	];
 
 	/**
-	 * Create a new Dingo\OAuth2\Storage\PDOAdapter instance.
+	 * Create a new Dingo\OAuth2\Storage\MySqlAdapter instance.
 	 * 
 	 * @param  \PDO  $connection
 	 * @param  array  $tables
@@ -46,7 +46,7 @@ class PdoAdapter extends Adapter {
 	/**
 	 * Create the client storage instance.
 	 * 
-	 * @return \Dingo\OAuth2\Storage\PDO\Client
+	 * @return \Dingo\OAuth2\Storage\MySql\Client
 	 */
 	public function createClientStorage()
 	{
@@ -56,7 +56,7 @@ class PdoAdapter extends Adapter {
 	/**
 	 * Create the token storage instance.
 	 * 
-	 * @return \Dingo\OAuth2\Storage\PDO\Token
+	 * @return \Dingo\OAuth2\Storage\MySql\Token
 	 */
 	public function createTokenStorage()
 	{
@@ -66,7 +66,7 @@ class PdoAdapter extends Adapter {
 	/**
 	 * Create the authorization code storage instance.
 	 * 
-	 * @return \Dingo\OAuth2\Storage\PDO\AuthorizationCode
+	 * @return \Dingo\OAuth2\Storage\MySql\AuthorizationCode
 	 */
 	public function createAuthorizationStorage()
 	{
@@ -76,7 +76,7 @@ class PdoAdapter extends Adapter {
 	/**
 	 * Create the scope storage instance.
 	 * 
-	 * @return \Dingo\OAuth2\Storage\PDO\Scope
+	 * @return \Dingo\OAuth2\Storage\MySql\Scope
 	 */
 	public function createScopeStorage()
 	{

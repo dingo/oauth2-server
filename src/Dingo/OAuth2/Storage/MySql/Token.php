@@ -1,10 +1,10 @@
-<?php namespace Dingo\OAuth2\Storage\PDO;
+<?php namespace Dingo\OAuth2\Storage\MySql;
 
 use Dingo\OAuth2\Storage\TokenInterface;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
-class Token extends PDO implements TokenInterface {
+class Token extends MySql implements TokenInterface {
 
 	/**
 	 * Insert a token into storage.

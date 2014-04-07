@@ -2,9 +2,9 @@
 
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 use Dingo\OAuth2\Entity\AuthorizationCode as AuthorizationCodeEntity;
-use Dingo\OAuth2\Storage\PDO\AuthorizationCode as AuthorizationCodeStorage;
+use Dingo\OAuth2\Storage\MySql\AuthorizationCode as AuthorizationCodeStorage;
 
-class StoragePDOAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
+class StorageMySqlAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 
 
 	public function setUp()

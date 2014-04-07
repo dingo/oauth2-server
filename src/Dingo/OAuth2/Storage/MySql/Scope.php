@@ -1,9 +1,9 @@
-<?php namespace Dingo\OAuth2\Storage\PDO;
+<?php namespace Dingo\OAuth2\Storage\MySql;
 
 use Dingo\OAuth2\Storage\ScopeInterface;
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
-class Scope extends PDO implements ScopeInterface {
+class Scope extends MySql implements ScopeInterface {
 
 	/**
 	 * Get a scope from storage.

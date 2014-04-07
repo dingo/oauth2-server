@@ -2,9 +2,9 @@
 
 use Dingo\OAuth2\Entity\Token as TokenEntity;
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
-use Dingo\OAuth2\Storage\PDO\Token as TokenStorage;
+use Dingo\OAuth2\Storage\MySql\Token as TokenStorage;
 
-class StoragePDOTokenTest extends PHPUnit_Framework_TestCase {
+class StorageMySqlTokenTest extends PHPUnit_Framework_TestCase {
 
 
 	public function setUp()

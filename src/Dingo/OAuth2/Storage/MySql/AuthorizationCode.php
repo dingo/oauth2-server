@@ -1,10 +1,10 @@
-<?php namespace Dingo\OAuth2\Storage\PDO;
+<?php namespace Dingo\OAuth2\Storage\MySql;
 
 use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 use Dingo\OAuth2\Storage\AuthorizationCodeInterface;
 use Dingo\OAuth2\Entity\AuthorizationCode as AuthorizationCodeEntity;
 
-class AuthorizationCode extends PDO implements AuthorizationCodeInterface {
+class AuthorizationCode extends MySql implements AuthorizationCodeInterface {
 
 	/**
 	 * Insert an authorization code into storage.

@@ -1,9 +1,9 @@
 <?php
 
 use Dingo\OAuth2\Entity\Client as ClientEntity;
-use Dingo\OAuth2\Storage\PDO\Client as ClientStorage;
+use Dingo\OAuth2\Storage\MySql\Client as ClientStorage;
 
-class StoragePDOClientTest extends PHPUnit_Framework_TestCase {
+class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 
 
 	public function setUp()
