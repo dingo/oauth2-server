@@ -27,7 +27,7 @@ All four OAuth 2.0 grant types detailed in the specification are implemented wit
 
 As of v0.1.0 the following storage adapters are available.
 
-- `Dingo\OAuth2\Storage\PDOAdapter`
+- `Dingo\OAuth2\Storage\MySqlAdapter`
 - `Dingo\OAuth2\Storage\RedisAdapter`
 
 Using the [dingo/oauth2-server-laravel](https://github.com/dingo/oauth2-server-laravel) package you also have.
@@ -36,7 +36,7 @@ Using the [dingo/oauth2-server-laravel](https://github.com/dingo/oauth2-server-l
 
 ### MySQL Table Structure
 
-The following is the table structure required for storage adapters which leverage MySQL. When developing your own storage adapters you can use this structure as a starting point.
+The following is the table structure required for the MySQL storage adapter. When developing your own storage adapters you can use this structure as a starting point.
 
 ```sql
 CREATE TABLE IF NOT EXISTS `oauth_authorization_codes` (
@@ -128,7 +128,7 @@ The responsibilities of the Authorization Server are to authorize and issue acce
 To issue an access token the Authorization Server must be configured with the desired storage adapter and grant types.
 
 ```php
-$storage = new Dingo\OAuth2\Storage\PDOAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
+$storage = new Dingo\OAuth2\Storage\MySqlAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
 
 $server = new Dingo\OAuth2\Server\Authorization($storage);
 ```
@@ -252,7 +252,7 @@ Authorization: Bearer nkwCbxJ8EAEqEM11vCrKLd2TAqJLfCN21beMjVGK
 The responsibility of the Resource Server is to authenticate a request by validating the supplied access token.
 
 ```php
-$storage = new Dingo\OAuth2\Storage\PDOAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
+$storage = new Dingo\OAuth2\Storage\MySqlAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
 
 $server = new Dingo\OAuth2\Server\Resource($storage);
 ```
