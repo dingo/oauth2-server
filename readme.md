@@ -40,58 +40,60 @@ The following is the table structure required for storage adapters which leverag
 
 ```
 CREATE TABLE IF NOT EXISTS `oauth_authorization_codes` (
-  `code` varchar(40) NOT NULL,
-  `client_id` varchar(255) NOT NULL,
-  `user_id` varchar(255) NOT NULL,
-  `redirect_uri` varchar(255) NOT NULL,
+  `code` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `client_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `user_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `redirect_uri` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `expires` datetime NOT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `oauth_authorization_code_scopes` (
-  `id` int(11) NOT NULL,
-  `code` varchar(40) NOT NULL,
-  `scope` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `scope` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `code` (`code`,`scope`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `oauth_clients` (
-  `id` varchar(40) NOT NULL,
-  `secret` varchar(40) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `secret` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `oauth_client_endpoints` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `client_id` varchar(40) NOT NULL,
-  `uri` varchar(255) NOT NULL,
+  `client_id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `uri` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `is_default` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `oauth_scopes` (
-  `scope` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `description` text NOT NULL,
+  `scope` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`scope`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `oauth_tokens` (
-  `token` varchar(40) NOT NULL,
-  `type` enum('access','refresh') NOT NULL DEFAULT 'access',
-  `client_id` varchar(40) NOT NULL,
-  `user_id` varchar(255) DEFAULT NULL,
+  `token` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `type` enum('access','refresh') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'access',
+  `client_id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `user_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `expires` datetime NOT NULL,
   PRIMARY KEY (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `oauth_token_scopes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `token` varchar(40) NOT NULL,
-  `scope` varchar(255) NOT NULL,
+  `token` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `scope` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `token` (`token`,`scope`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=63 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 ```
 
 ## Usage Guide
@@ -243,3 +245,29 @@ The client should save the refresh token and all subsequent requests to protecte
 Authorization: Bearer nkwCbxJ8EAEqEM11vCrKLd2TAqJLfCN21beMjVGK
 ```
 
+### Resource Server
+
+The responsibility of the Resource Server is to authenticate a request by validating the supplied access token.
+
+```
+$storage = new Dingo\OAuth2\Storage\PDOAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
+
+$server = new Dingo\OAuth2\Server\Resource($storage);
+```
+
+We can now validate that a request contains an access token that exists and has not expired.
+
+```
+try
+{
+	$server->validateRequest();
+}
+catch (Dingo\OAuth2\Exception\InvalidTokenException $exception)
+{
+	header('Content-Type: application/json', true, $exception->getStatusCode());
+
+	echo $exception->getMessage();
+
+	exit;
+}
+```
