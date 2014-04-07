@@ -38,7 +38,7 @@ Using the [dingo/oauth2-server-laravel](https://github.com/dingo/oauth2-server-l
 
 The following is the table structure required for storage adapters which leverage MySQL. When developing your own storage adapters you can use this structure as a starting point.
 
-```
+```sql
 CREATE TABLE IF NOT EXISTS `oauth_authorization_codes` (
   `code` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `client_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -127,7 +127,7 @@ The responsibilities of the Authorization Server are to authorize and issue acce
 
 To issue an access token the Authorization Server must be configured with the desired storage adapter and grant types.
 
-```
+```php
 $storage = new Dingo\OAuth2\Storage\PDOAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
 
 $server = new Dingo\OAuth2\Server\Authorization($storage);
@@ -135,13 +135,14 @@ $server = new Dingo\OAuth2\Server\Authorization($storage);
 
 We can now register the four different grant types depending on the projects requirements. For this guide we'll only be using the standard Authorization Code grant type.
 
-```
+```php
 $server->registerGrant(new Dingo\OAuth2\Grant\AuthorizationCode);
 ```
 
 We'll now need a route that will handle the attempted authorization. This guide will assume this route is at `http://localhost/example-server/authorize`.
 
-```
+```html+php
+<?php
 // If the user is not logged in we'll redirect them to the login form
 // with the query string that was sent with the initial request.
 if ( ! isset($_SESSION['user']))
@@ -194,6 +195,7 @@ else
 <?php
 	}
 }
+?>
 ```
 
 The client can now prompt a user to authorize via OAuth 2.0 by directing the user to a similar URI as follows (note that spacing has been added for readability).
@@ -211,7 +213,7 @@ If the Authorization Server detects that the user is not logged in they will be 
 
 Now that the client has the authorization code it needs to request an access token from the Authorization Server using the code. We'll need a route that will handle the issuing of access tokens. This guide will assume the route is at `http://localhost/example-server/token`.
 
-```
+```php
 header('Content-Type: application/json');
 
 echo json_encode($server->issueAccessToken());
@@ -229,7 +231,7 @@ http://localhost/example-server/token
 
 The Authorization Server should respond with a JSON payload similar to the following.
 
-```
+```json
 {
 	"access_token": "nkwCbxJ8EAEqEM11vCrKLd2TAqJLfCN21beMjVGK",
 	"token_type": "Bearer",
@@ -249,7 +251,7 @@ Authorization: Bearer nkwCbxJ8EAEqEM11vCrKLd2TAqJLfCN21beMjVGK
 
 The responsibility of the Resource Server is to authenticate a request by validating the supplied access token.
 
-```
+```php
 $storage = new Dingo\OAuth2\Storage\PDOAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
 
 $server = new Dingo\OAuth2\Server\Resource($storage);
@@ -257,7 +259,7 @@ $server = new Dingo\OAuth2\Server\Resource($storage);
 
 We can now validate that a request contains an access token that exists and has not expired.
 
-```
+```php
 try
 {
 	$server->validateRequest();
