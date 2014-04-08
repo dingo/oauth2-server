@@ -15,7 +15,7 @@ class StorageAdapterTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @expectedException \RuntimeException
-	 * @expectedExceptionMessage Storage driver [invalid] is not supported.
+	 * @expectedExceptionMessage Storage driver "invalid" is not supported.
 	 */
 	public function testGettingInvalidStorageThrowsRuntimeException()
 	{

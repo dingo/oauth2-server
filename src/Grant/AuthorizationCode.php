@@ -43,24 +43,24 @@ class AuthorizationCode extends ResponseGrant {
 		// and that the code has not expired.
 		if ( ! $code = $this->storage->get('authorization')->get($this->request->get('code')))
 		{
-			throw new ClientException('The authorization code does not exist.', 400);
+			throw new ClientException('unknown_authorization_code', 'The authorization code does not exist.', 400);
 		}
 
 		$client = $this->validateConfidentialClient();
 
 		if ($code->getClientId() != $client->getId())
 		{
-			throw new ClientException('The authorization code is not associated with the client.', 400);
+			throw new ClientException('mismatched_client', 'The authorization code is not associated with the client.', 400);
 		}
 
 		if ($code->getRedirectUri() != $this->request->get('redirect_uri'))
 		{
-			throw new ClientException('The redirection URI does not match the redirection URI of the authorization code.', 400);
+			throw new ClientException('mismatched_redirection_uri', 'The redirection URI does not match the redirection URI of the authorization code.', 400);
 		}
 
 		if ($code->getExpires() < time())
 		{
-			throw new ClientException('The authorization code has expired.', 400);
+			throw new ClientException('expired_authorization_code', 'The authorization code has expired.', 400);
 		}
 
 		$token = $this->createToken('access', $client->getId(), $code->getUserId(), $code->getScopes());

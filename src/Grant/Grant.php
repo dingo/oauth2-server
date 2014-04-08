@@ -85,7 +85,7 @@ abstract class Grant implements GrantInterface {
 			return $client;
 		}
 
-		throw new ClientException('The client failed to authenticate.', 401);
+		throw new ClientException('client_authentication_failed', 'The client failed to authenticate.', 401);
 	}
 
 	/**
@@ -112,7 +112,7 @@ abstract class Grant implements GrantInterface {
 			return $client;
 		}
 
-		throw new ClientException('The redirection URI is not registered to the client.', 401);
+		throw new ClientException('client_authentication_failed', 'The redirection URI is not registered to the client.', 401);
 	}
 
 	/**
@@ -141,7 +141,7 @@ abstract class Grant implements GrantInterface {
 		{
 			if ( ! $this->request->get($parameter))
 			{
-				throw new ClientException('The request is missing the "'.$parameter.'" parameter.', 400);
+				throw new ClientException('missing_parameter', 'The request is missing the "'.$parameter.'" parameter.', 400);
 			}
 
 			$values[] = $this->request->get($parameter);

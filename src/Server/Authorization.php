@@ -142,17 +142,17 @@ class Authorization {
 
 		if ( ! $this->request->isMethod('post'))
 		{
-			throw new ClientException('The request method must be POST.', 400);
+			throw new ClientException('unsupported_request_method', 'The request method must be POST.', 400);
 		}
 
 		if ( ! $grant = $this->request->request->get('grant_type'))
 		{
-			throw new ClientException('The request is missing the "grant_type" parameter.', 400);
+			throw new ClientException('missing_parameter', 'The request is missing the "grant_type" parameter.', 400);
 		}
 
 		if ( ! isset($this->grants[$grant]))
 		{
-			throw new ClientException('The authorization server does not support the requested grant.', 400);
+			throw new ClientException('unknown_grant', 'The authorization server does not support the requested grant.', 400);
 		}
 
 		$accessToken = $this->grants[$grant]->execute();
@@ -247,7 +247,7 @@ class Authorization {
 	{
 		if ( ! isset($this->responseTypes[$this->request->get('response_type')]))
 		{
-			throw new ClientException('The authorization server does not recognize the provided response type.', 400);
+			throw new ClientException('unknown_response_type', 'The authorization server does not recognize the provided response type.', 400);
 		}
 
 		$key = $this->responseTypes[$this->request->get('response_type')];

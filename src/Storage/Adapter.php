@@ -86,7 +86,7 @@ abstract class Adapter {
 			return $this->{$method}();
 		}
 
-		throw new RuntimeException("Storage driver [{$storage}] is not supported.");
+		throw new RuntimeException('Storage driver "'.$storage.'" is not supported.');
 	}
 
 	/**

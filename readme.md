@@ -268,8 +268,39 @@ catch (Dingo\OAuth2\Exception\InvalidTokenException $exception)
 {
 	header('Content-Type: application/json', true, $exception->getStatusCode());
 
-	echo $exception->getMessage();
+	echo json_encode(['error' => $exception->getError(), 'message' => $exception->getMessage()]);
 
 	exit;
 }
 ```
+
+### Exception Errors
+
+When issuing access tokens or validating requests for a protected resource exceptions may be thrown when something goes wrong, e.g., missing a required parameter in the request. Generally speaking all exceptions thrown will extend from `Dingo\OAuth2\Exception\OAuthException`. Each exception will have an error type, a message, and an HTTP status code.
+
+This allows you to return more informative responses to clients. Returning both the error type and error message is convenient for clients to distinguish what actually happened and react accordingly.
+
+Refer to the **Resource Server** example above to see how exceptions should be caught and returned to the client.
+
+#### Error Types
+
+The following tables describes the error types and the reason as to why this error was raised.
+
+| Error                         | Reason
+| ----------------------------- | ------------------------------------------------------------------- |
+| missing_parameter             | The request is missing a required parameter.                        |
+| suspicious_scope              | The supplied scope was not originally issued with the access token. |
+| unknown_scope                 | The supplied scope does not exist.                                  |
+| invalid_scope                 | The supplied scope is not associated with the token.                |
+| mismatched_scope              | The scope is not associated with the access token.                  |
+| unsupported_request_method    | The server does not support the given request method.               |
+| unknown_grant                 | The supplied grant type has not been registered on the server.      |
+| unknown_response_type         | The supplied response type has not been registered on the server.   |
+| unknown_token                 | The supplied token does not exist.                                  |
+| expired_token                 | The supplied token has expired.                                     |
+| unknown_authorization_code    | The supplied authorization code does not exist.                     |
+| expired_authorization_code    | The supplied authorization code has expired.                        |
+| mismatched_client             | The client is not associated with the authorization code.           |
+| mismatched_redirectection_uri | The redirection URIs do not match.                                  |
+| client_authentication_failed  | The client failed to authenticate.                                  |
+| user_authentication_failed    | The user failed to authenticate.                                    |

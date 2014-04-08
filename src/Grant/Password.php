@@ -28,7 +28,7 @@ class Password extends Grant {
 
 		if ( ! $userId = call_user_func($this->authenticationCallback, $username, $password))
 		{
-			throw new ClientException('The user credentials failed to authenticate.', 400);
+			throw new ClientException('user_authentication_failed', 'The user credentials failed to authenticate.', 400);
 		}
 
 		$client = $this->validateConfidentialClient();

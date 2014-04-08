@@ -72,7 +72,7 @@ class ScopeValidator {
 		// parameter was missing.
 		if ($this->scopeRequired and is_null($this->defaultScope) and empty($requestedScopes) and empty($originalScopes))
 		{
-			throw new ClientException('The request is missing the "scope" parameter.', 400);
+			throw new ClientException('missing_parameter', 'The request is missing the "scope" parameter.', 400);
 		}
 
 		// If default scopes were provided and no scopes were requested then
@@ -98,7 +98,7 @@ class ScopeValidator {
 			{
 				if ( ! isset($originalScopes[$requestedScope]))
 				{
-					throw new ClientException("The requested scope [{$requestedScope}] was not originally requested for this token.", 400);
+					throw new ClientException('suspicious_scope', 'The requested scope "'.$requestedScope.'" was not originally requested for this token.', 400);
 				}
 			}
 		}
@@ -109,7 +109,7 @@ class ScopeValidator {
 		{
 			if ( ! $scope = $this->storage->get($requestedScope))
 			{
-				throw new ClientException("The requested scope [{$requestedScope}] is invalid or unknown.", 400);
+				throw new ClientException('unknown_scope', 'The requested scope "'.$requestedScope.'" is invalid or unknown.', 400);
 			}
 
 			$scopes[$scope->getScope()] = $scope;

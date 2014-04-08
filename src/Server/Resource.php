@@ -52,19 +52,19 @@ class Resource {
 	{
 		if ( ! $token = $this->getAccessToken())
 		{
-			throw new InvalidTokenException('Access token was not supplied.', 401);
+			throw new InvalidTokenException('missing_parameter', 'Access token was not supplied.', 401);
 		}
 
 		if ( ! $token = $this->storage->get('token')->getWithScopes($token))
 		{
-			throw new InvalidTokenException('Invalid access token.', 401);
+			throw new InvalidTokenException('unknown_token', 'Invalid access token.', 401);
 		}
 
 		if ($this->tokenHasExpired($token))
 		{
 			$this->storage->get('token')->delete($token->getToken());
 
-			throw new InvalidTokenException('Access token has expired.', 401);
+			throw new InvalidTokenException('expired_token', 'Access token has expired.', 401);
 		}
 
 		$this->validateTokenScopes($token, $scopes);
@@ -101,7 +101,7 @@ class Resource {
 		{
 			if ( ! $token->hasScope($scope))
 			{
-				throw new InvalidTokenException('Requested scope "'.$scope.'" is not associated with this access token.', 401);
+				throw new InvalidTokenException('mismatched_scope', 'Requested scope "'.$scope.'" is not associated with this access token.', 401);
 			}
 		}
 		
