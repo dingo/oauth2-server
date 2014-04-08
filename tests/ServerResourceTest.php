@@ -4,6 +4,7 @@ use Mockery as m;
 use Dingo\OAuth2\Server\Resource;
 use Symfony\Component\HttpFoundation\Request;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
+use Dingo\OAuth2\Entity\Scope as ScopeEntity;
 
 class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
@@ -101,7 +102,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$storage = $this->getStorageMock();
 
-		$storage->shouldReceive('get')->with('token')->andReturn(m::mock(['get' => false]));
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock(['getWithScopes' => false]));
 
 		$resource = new Resource($storage, $request);
 
@@ -119,7 +120,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 		$storage = $this->getStorageMock();
 
 		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
-			'get' => new TokenEntity(12345, 'access', 'test', 1, time() - 3600),
+			'getWithScopes' => new TokenEntity(12345, 'access', 'test', 1, time() - 3600),
 			'delete' => true
 		]));
 
@@ -130,6 +131,27 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException \Dingo\OAuth2\Exception\InvalidTokenException
+	 */
+	public function testValidatingResourceWithUnassociatedScopeThrowsException()
+	{
+		$request = Request::create('foo', 'GET', ['access_token' => 12345]);
+
+		$storage = $this->getStorageMock();
+
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
+			'getWithScopes' => new TokenEntity(12345, 'access', 'test', 1, time() + 3600),
+			'delete' => true
+		]));
+
+
+		$resource = new Resource($storage, $request);
+
+		$resource->validateRequest('foo');
+	}
+
+
 	public function testValidatingResourceWithValidTokenSucceeds()
 	{
 		$request = Request::create('foo', 'GET', ['access_token' => 12345]);
@@ -137,11 +159,31 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 		$storage = $this->getStorageMock();
 
 		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
-			'get' => new TokenEntity(12345, 'access', 'test', 1, time() + 3600)
+			'getWithScopes' => new TokenEntity(12345, 'access', 'test', 1, time() + 3600)
 		]));
 
 
 		$resource = new Resource($storage, $request);
+
+		$token = $resource->validateRequest();
+
+		$this->assertEquals(12345, $token->getToken());
+	}
+
+
+	public function testValidatingResourceWithValidTokenAndDefaultScopesSucceeds()
+	{
+		$request = Request::create('foo', 'GET', ['access_token' => 12345]);
+
+		$storage = $this->getStorageMock();
+
+		$token = (new TokenEntity(12345, 'access', 'test', 1, time() + 3600))->attachScopes([
+			'foo' => new ScopeEntity('foo', 'foo', 'foo')
+		]);
+
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock(['getWithScopes' => $token]));
+
+		$resource = (new Resource($storage, $request))->setDefaultScopes(['foo']);
 
 		$token = $resource->validateRequest();
 

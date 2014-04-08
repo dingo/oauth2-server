@@ -22,11 +22,11 @@ class Resource {
 	protected $request;
 
 	/**
-	 * Authenticated token entity.
+	 * Array of default scopes.
 	 * 
-	 * @var \Dingo\OAuth2\Entity\Token
+	 * @var array
 	 */
-	protected $token;
+	protected $defaultScopes = [];
 
 	/**
 	 * Create a new Dingo\OAuth2\Server\Resource instance.
@@ -44,29 +44,32 @@ class Resource {
 	/**
 	 * Validate an access token.
 	 * 
+	 * @param  string|array  $scopes
 	 * @return \Dingo\OAuth2\Entity\Token
 	 * @throws \Dingo\OAuth2\Exception\InvalidTokenException
 	 */
-	public function validateRequest()
+	public function validateRequest($scopes = null)
 	{
 		if ( ! $token = $this->getAccessToken())
 		{
 			throw new InvalidTokenException('Access token was not supplied.', 401);
 		}
 
-		if ( ! $this->token = $this->storage->get('token')->get($token))
+		if ( ! $token = $this->storage->get('token')->getWithScopes($token))
 		{
 			throw new InvalidTokenException('Invalid access token.', 401);
 		}
 
-		if ($this->tokenHasExpired($this->token))
+		if ($this->tokenHasExpired($token))
 		{
-			$this->storage->get('token')->delete($token);
+			$this->storage->get('token')->delete($token->getToken());
 
 			throw new InvalidTokenException('Access token has expired.', 401);
 		}
 
-		return $this->token;
+		$this->validateTokenScopes($token, $scopes);
+
+		return $token;
 	}
 
 	/**
@@ -78,6 +81,30 @@ class Resource {
 	protected function tokenHasExpired(TokenEntity $token)
 	{
 		return $token->getExpires() < time();
+	}
+
+	/**
+	 * Validate token scopes.
+	 * 
+	 * @param  \Dingo\OAuth2\Entity\Token  $token
+	 * @param  string|array  $scopes
+	 * @return void
+	 * @throws \Dingo\OAuth2\Exception\InvalidTokenException
+	 */
+	protected function validateTokenScopes(TokenEntity $token, $scopes)
+	{
+		// Build our array of scopes by merging the provided scopes with the
+		// default scopes that are used for every request.
+		$scopes = array_merge($this->defaultScopes, (array) $scopes);
+
+		foreach ($scopes as $scope)
+		{
+			if ( ! $token->hasScope($scope))
+			{
+				throw new InvalidTokenException('Requested scope "'.$scope.'" is not associated with this access token.', 401);
+			}
+		}
+		
 	}
 
 	/**
@@ -102,6 +129,19 @@ class Resource {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Set the default scopes.
+	 * 
+	 * @param  array  $scopes
+	 * @return \Dingo\OAuth2\Server\Resource
+	 */
+	public function setDefaultScopes(array $scopes)
+	{
+		$this->defaultScopes = $scopes;
+
+		return $this;
 	}
 
 }
