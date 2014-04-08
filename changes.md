@@ -1,6 +1,6 @@
 ## Changes
 
-### 0.1.2
+### 0.1.2 (April 8th, 2014)
 
 - Switch to PSR-4 autoloading.
 - Fixed bug where resources could not be protected by a scope.
