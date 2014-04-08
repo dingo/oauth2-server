@@ -1,5 +1,9 @@
 ## Changes
 
+### 0.1.3
+
+- Throw more meaningful exception by including a generic error type.
+
 ### 0.1.2 (April 8th, 2014)
 
 - Switch to PSR-4 autoloading.
