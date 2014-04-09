@@ -93,5 +93,70 @@ class Client extends MySql implements ClientInterface {
 
 		return new ClientEntity($client['id'], $client['secret'], $client['name'], $client['redirect_uri']);
 	}
+
+	/**
+	 * Create a client and associated redirection URIs.
+	 * 
+	 * @param  string  $id
+	 * @param  string  $secret
+	 * @param  string  $name
+	 * @param  array  $redirectUris
+	 * @return \Dingo\OAuth2\Entity\Client|bool
+	 */
+	public function create($id, $secret, $name, $redirectUris = [])
+	{
+		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (id, secret, name) VALUES (:id, :secret, :name)', $this->tables['clients']));
+
+		$bindings = [
+			':id'     => $id,
+			':secret' => $secret,
+			':name'   => $name
+		];
+
+		if ( ! $query->execute($bindings))
+		{
+			return false;
+		}
+
+		$redirectUri = null;
+
+		if ( ! empty($redirectUris))
+		{
+			$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (client_id, uri, is_default) 
+				VALUES (:client_id, :uri, :is_default)', $this->tables['client_endpoints']));
+
+			foreach ($redirectUris as $uri)
+			{
+				// If this redirection URI is the default then we'll set our redirection URI
+				// to this URI for when we return the client entity.
+				if ($uri['default'])
+				{
+					$redirectUri = $uri['uri'];
+				}
+
+				$query->execute([
+					':client_id' => $id,
+					':uri' => $uri['uri'],
+					':is_default' => (int) $uri['default']
+				]);
+			}
+		}
+
+		return new ClientEntity($id, $secret, $name, $redirectUri);
+	}
+
+	/**
+	 * Delete a client and associated redirection URIs.
+	 * 
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function delete($id)
+	{
+		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE %1$s.id = :id; 
+			DELETE FROM %2$s WHERE %2$s.client_id = :id', $this->tables['clients'], $this->tables['client_endpoints']));
+
+		$query->execute([':id' => $id]);
+	}
 	
 }

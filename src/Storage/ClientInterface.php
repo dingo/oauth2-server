@@ -44,4 +44,43 @@ interface ClientInterface {
 	 */
 	public function get($id, $secret = null, $redirectUri = null);
 
+	/**
+	 * Create a client and associated redirection URIs.
+	 * 
+	 * Example MySQL query to create client:
+	 * 
+	 * INSERT INTO oauth_clients (id, secret, name) 
+	 * VALUES (:id, :secret, :name)
+	 * 
+	 * Example MySQL query to create associated redirection URIs:
+	 * 
+	 * INSERT INTO oauth_client_endpoints (client_id, uri, is_default) 
+	 * VALUES (:client_id, :uri, :is_default)
+	 * 
+	 * @param  string  $id
+	 * @param  string  $secret
+	 * @param  string  $name
+	 * @param  array  $redirectUris
+	 * @return \Dingo\OAuth2\Entity\Client|bool
+	 */
+	public function create($id, $secret, $name, $redirectUris = []);
+
+	/**
+	 * Delete a client and associated redirection URIs.
+	 * 
+	 * Example MySQL query to delete client:
+	 * 
+	 * DELETE FROM oauth_clients
+	 * WHERE oauth_clients.id = :id
+	 * 
+	 * Example MySQL query to delete associated redirection URIs:
+	 * 
+	 * DELETE FROM oauth_client_endpoints
+	 * WHERE oauth_client_endpoints.client_id = :id
+	 * 
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function delete($id);
+
 }

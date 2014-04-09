@@ -77,4 +77,70 @@ class Client extends Redis implements ClientInterface {
 		return new ClientEntity($id, $client['secret'], $client['name'], $client['redirect_uri']);
 	}
 
+	/**
+	 * Create a client and associated redirection URIs.
+	 * 
+	 * @param  string  $id
+	 * @param  string  $secret
+	 * @param  string  $name
+	 * @param  array  $redirectUris
+	 * @return \Dingo\OAuth2\Entity\Client|bool
+	 */
+	public function create($id, $secret, $name, $redirectUris = [])
+	{
+		$payload = [
+			'secret' => $secret,
+			'name' => $name
+		];
+
+		if ( ! $this->setValue($id, $this->tables['clients'], $payload))
+		{
+			return false;
+		}
+
+		if ( ! $this->pushSet(null, $this->tables['clients'], $id))
+		{
+			$this->delete($id);
+
+			return false;
+		}
+
+		$redirectUri = null;
+
+		if ( ! empty($redirectUris))
+		{
+			foreach ($redirectUris as $uri)
+			{
+				// If this redirection URI is the default then we'll set our redirection URI
+				// to this URI for when we return the client entity.
+				if ($uri['default'])
+				{
+					$redirectUri = $uri['uri'];
+				}
+
+				$this->pushSet($id, $this->tables['client_endpoints'], [
+					'uri' => $uri['uri'],
+					'is_default' => (int) $uri['default']
+				]);
+			}
+		}
+
+		return new ClientEntity($id, $secret, $name, $redirectUri);
+	}
+
+	/**
+	 * Delete a client and associated redirection URIs.
+	 * 
+	 * @param  string  $id
+	 * @return void
+	 */
+	public function delete($id)
+	{
+		$this->deleteKey($id, $this->tables['clients']);
+
+		$this->deleteSet(null, $this->tables['clients'], $id);
+
+		$this->deleteKey($id, $this->tables['client_endpoints']);
+	}
+
 }
