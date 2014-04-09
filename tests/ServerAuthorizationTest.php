@@ -4,6 +4,7 @@ use Mockery as m;
 use Dingo\OAuth2\Server\Authorization;
 use Symfony\Component\HttpFoundation\Request;
 use Dingo\OAuth2\Entity\Token as TokenEntity;
+use Dingo\OAuth2\Entity\Client as ClientEntity;
 use Dingo\OAuth2\Entity\AuthorizationCode as AuthorizationCodeEntity;
 
 class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
@@ -98,7 +99,10 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = $this->getStorageMock();
 
-		$storage->shouldReceive('get')->with('token')->andReturn(m::mock(['create' => true, 'associateScopes' => true]));
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
+			'create' => new TokenEntity('test_refresh', 'refresh', 'test', 1, 1),
+			'associateScopes' => true
+		]));
 
 		$authorization = new Authorization($storage, Request::create('testing', 'POST', ['grant_type' => 'password']));
 
@@ -108,6 +112,27 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 		$token = $authorization->issueAccessToken();
 
 		$this->assertEquals('test_refresh', $token['refresh_token']);
+	}
+
+
+	public function testIssuingAccessTokenCallsAuthorizedCallback()
+	{
+		$storage = $this->getStorageMock();
+
+		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test')
+		]));
+
+		$authorization = new Authorization($storage, Request::create('testing', 'POST', ['grant_type' => 'password']));
+
+		$authorization->registerGrant(new PasswordGrantStub);
+		$authorization->setAuthorizedCallback(function($token, $client)
+		{
+			$this->assertInstanceOf('Dingo\OAuth2\Entity\Token', $token);
+			$this->assertInstanceOf('Dingo\OAuth2\Entity\Client', $client);
+		});
+
+		$token = $authorization->issueAccessToken();
 	}
 
 

@@ -247,6 +247,37 @@ The client should save the refresh token and all subsequent requests to protecte
 Authorization: Bearer nkwCbxJ8EAEqEM11vCrKLd2TAqJLfCN21beMjVGK
 ```
 
+#### Authorized Callback
+
+You can set an optional authorized callback that is fired once a client has been authorized. This is useful for when you want to avoid prompting a user to authorize a client that they've already authorized in the past with the same scopes. The callback receives two parameters, the first being an instance of `Dingo\OAuth2\Entity\Token` and the second being an instance of `Dingo\OAuth2\Entity\Client`.
+
+```php
+$server->setAuthorizedCallback(function($token, $client)
+{
+	// Insert a record into your database showing that $token->getUserId() has authorized
+	// $client->getId() with $token->getScopes() and that in the future the server
+	// can skip the prompt.
+});
+```
+
+It's up to you to implement the code required to check if the user has already authorized the client in the past. As an example you might adjust the `if` statement earlier to check the existence of a database record.
+
+```php
+$alreadyAuthorized = $db->table('user_authorized_clients')
+                        ->where('client_id', '=', $payload['client']->getId())
+                        ->where('user_id', '=', $_SESSION['user']['id'])
+                        ->exists();
+
+if (isset($_POST['submit']) or $alreadyAuthorized == true)
+{
+	$response = $server->handleAuthorizationRequest($payload['client_id'], $payload['user_id'], $payload['redirect_uri'], $payload['scopes']);
+
+	header("Location: {$server->makeRedirectUri($response)}");
+}
+```
+
+> Be sure to only authorize requests that have the same scopes or less. Never authorize a request that includes different scopes as the user should be give the chance the review and either approve or deny the request.
+
 ### Resource Server
 
 The responsibility of the Resource Server is to authenticate a request by validating the supplied access token.

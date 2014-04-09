@@ -3,6 +3,8 @@
 ### 0.1.3
 
 - Throw more meaningful exception by including a generic error type.
+- Can now create and delete clients and scopes.
+- User defined authorized callback is now fired once an access token has been issued.
 
 ### 0.1.2 (April 8th, 2014)
 
