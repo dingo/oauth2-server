@@ -188,7 +188,7 @@ class Authorization {
 		// a client once they have already given the client permission.
 		if ($this->authorizedCallback instanceof Closure)
 		{
-			$client = $this->storage->get('client')->get($accessToken->getClientId());
+			$client = $this->storage('client')->get($accessToken->getClientId());
 
 			call_user_func($this->authorizedCallback, $accessToken, $client);
 		}
@@ -215,9 +215,9 @@ class Authorization {
 
 		$expires = time() + $this->refreshTokenExpiration;
 
-		$refreshToken = $this->storage->get('token')->create($refreshToken, 'refresh', $accessToken->getClientId(), $accessToken->getUserId(), $expires);
+		$refreshToken = $this->storage('token')->create($refreshToken, 'refresh', $accessToken->getClientId(), $accessToken->getUserId(), $expires);
 
-		$this->storage->get('token')->associateScopes($refreshToken, $accessToken->getScopes());
+		$this->storage('token')->associateScopes($refreshToken, $accessToken->getScopes());
 
 		return $refreshToken;
 	}
@@ -313,7 +313,7 @@ class Authorization {
 
 		if ( ! $redirectUri = $this->request->get('redirect_uri'))
 		{
-			$client = $this->storage->get('client')->get($this->request->get('client_id'));
+			$client = $this->storage('client')->get($this->request->get('client_id'));
 			
 			if ( ! $redirectUri = $client->getRedirectUri())
 			{
@@ -325,13 +325,24 @@ class Authorization {
 	}
 
 	/**
-	 * Get the storage adapter instance.
+	 * Get a specific storage from the storage adapter.
+	 * 
+	 * @param  string  $storage
+	 * @return mixed
+	 */
+	public function storage($storage)
+	{
+		return $this->getStorage($storage);
+	}
+
+	/**
+	 * Get the storage adapter instance or a specific storage instance.
 	 * 
 	 * @return \Dingo\OAuth2\Storage\Adapter
 	 */
-	public function getStorage()
+	public function getStorage($storage = null)
 	{
-		return $this->storage;
+		return ! is_null($storage) ? $this->storage->get($storage) : $this->storage;
 	}
 
 	/**
@@ -367,7 +378,7 @@ class Authorization {
 	{
 		if ( ! isset($this->scopeValidator))
 		{
-			$this->scopeValidator = new ScopeValidator($this->request, $this->storage->get('scope'));
+			$this->scopeValidator = new ScopeValidator($this->request, $this->storage('scope'));
 		}
 
 		return $this->scopeValidator;

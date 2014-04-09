@@ -19,9 +19,9 @@ class AuthorizationCode extends ResponseGrant {
 	{
 		$expires = time() + 600;
 
-		$code = $this->storage->get('authorization')->create($this->generateToken(), $clientId, $userId, $redirectUri, $expires);
+		$code = $this->storage('authorization')->create($this->generateToken(), $clientId, $userId, $redirectUri, $expires);
 
-		$this->storage->get('authorization')->associateScopes($code->getCode(), $scopes);
+		$this->storage('authorization')->associateScopes($code->getCode(), $scopes);
 
 		return $code;
 	}
@@ -41,7 +41,7 @@ class AuthorizationCode extends ResponseGrant {
 		// the validated client above matches the client that the code was
 		// issued to. We'll also ensure that the redirection URIs match
 		// and that the code has not expired.
-		if ( ! $code = $this->storage->get('authorization')->get($this->request->get('code')))
+		if ( ! $code = $this->storage('authorization')->get($this->request->get('code')))
 		{
 			throw new ClientException('unknown_authorization_code', 'The authorization code does not exist.', 400);
 		}
@@ -72,7 +72,7 @@ class AuthorizationCode extends ResponseGrant {
 
 		// We no longer need the authorization code so we can safely delete it
 		// from the storage.
-		$this->storage->get('authorization')->delete($code->getCode());
+		$this->storage('authorization')->delete($code->getCode());
 
 		return $token;
 	}

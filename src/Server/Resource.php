@@ -55,14 +55,14 @@ class Resource {
 			throw new InvalidTokenException('missing_parameter', 'Access token was not supplied.', 401);
 		}
 
-		if ( ! $token = $this->storage->get('token')->getWithScopes($token))
+		if ( ! $token = $this->storage('token')->getWithScopes($token))
 		{
 			throw new InvalidTokenException('unknown_token', 'Invalid access token.', 401);
 		}
 
 		if ($this->tokenHasExpired($token))
 		{
-			$this->storage->get('token')->delete($token->getToken());
+			$this->storage('token')->delete($token->getToken());
 
 			throw new InvalidTokenException('expired_token', 'Access token has expired.', 401);
 		}
@@ -142,6 +142,17 @@ class Resource {
 		$this->defaultScopes = $scopes;
 
 		return $this;
+	}
+
+	/**
+	 * Get a specific storage from the storage adapter.
+	 * 
+	 * @param  string  $storage
+	 * @return mixed
+	 */
+	public function storage($storage)
+	{
+		return $this->storage->get($storage);
 	}
 
 }

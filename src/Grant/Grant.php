@@ -64,7 +64,7 @@ abstract class Grant implements GrantInterface {
 
 		// If we have a client ID and secret we'll attempt to verify the client by
 		// grabbing its details from the storage adapter.
-		if (( ! $strict or ($strict and $id and $secret)) and $client = $this->storage->get('client')->get($id, $secret, $redirectUri))
+		if (( ! $strict or ($strict and $id and $secret)) and $client = $this->storage('client')->get($id, $secret, $redirectUri))
 		{
 			return $client;
 		}
@@ -134,11 +134,11 @@ abstract class Grant implements GrantInterface {
 
 		$expires = time() + $this->{$type.'TokenExpiration'};
 
-		$token = $this->storage->get('token')->create($token, $type, $clientId, $userId, $expires);
+		$token = $this->storage('token')->create($token, $type, $clientId, $userId, $expires);
 
 		if ($scopes)
 		{
-			$this->storage->get('token')->associateScopes($token->getToken(), $scopes);
+			$this->storage('token')->associateScopes($token->getToken(), $scopes);
 
 			$token->attachScopes($scopes);
 		}
@@ -249,6 +249,17 @@ abstract class Grant implements GrantInterface {
 	public function getResponseType()
 	{
 		return null;
+	}
+
+	/**
+	 * Get a specific storage from the storage adapter.
+	 * 
+	 * @param  string  $storage
+	 * @return mixed
+	 */
+	public function storage($storage)
+	{
+		return $this->storage->get($storage);
 	}
 
 }

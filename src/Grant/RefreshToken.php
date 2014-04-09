@@ -15,7 +15,7 @@ class RefreshToken extends Grant {
 
 		$client = $this->strictlyValidateClient();
 
-		$oldToken = $this->storage->get('token')->getWithScopes($token);
+		$oldToken = $this->storage('token')->getWithScopes($token);
 
 		$scopes = $this->validateScopes($oldToken->getScopes());
 
@@ -25,7 +25,7 @@ class RefreshToken extends Grant {
 		
 		// Delete the old refresh token from the storage so that we can create a
 		// new refresh token. Again the scopes will be associated.
-		$this->storage->get('token')->delete($oldToken->getToken());
+		$this->storage('token')->delete($oldToken->getToken());
 
 		$refreshToken = $this->createToken('refresh', $oldToken->getClientId(), $oldToken->getUserId(), $scopes);
 
