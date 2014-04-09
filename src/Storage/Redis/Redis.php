@@ -142,6 +142,26 @@ abstract class Redis {
 	}
 
 	/**
+	 * Delete a value from a set.
+	 * 
+	 * @param  string  $key
+	 * @param  string  $table
+	 * @param  string  $value
+	 * @return int
+	 */
+	public function deleteSet($key, $table, $value)
+	{
+		$key = $this->prefix($key, $table);
+
+		if (isset($this->cache[$key]) and $cacheKey = array_search($this->cache[$key], $value))
+		{
+			unset($this->cache[$key][$cacheKey]);
+		}
+
+		return $this->redis->srem($key, $value);
+	}
+
+	/**
 	 * Delete a key from the Redis store.
 	 * 
 	 * @param  string  $key
