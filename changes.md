@@ -1,6 +1,6 @@
 ## Changes
 
-### 0.1.3
+### 0.1.3 (April 10th, 2014)
 
 - Throw more meaningful exception by including a generic error type.
 - Can now create and delete clients and scopes.
