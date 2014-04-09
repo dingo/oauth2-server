@@ -162,22 +162,6 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreateClientSucceedsAndReturnsClientEntity()
-	{
-		$storage = new ClientStorage($this->redis, ['clients' => 'clients']);
-
-		$this->redis->shouldReceive('set')->once()->with('clients:test', '{"secret":"test","name":"test"}')->andReturn(true);
-		$this->redis->shouldReceive('sadd')->once()->with('clients', 'test')->andReturn(true);
-
-		$this->assertEquals([
-			'id' => 'test',
-			'secret' => 'test',
-			'name' => 'test',
-			'redirect_uri' => null
-		], $storage->create('test', 'test', 'test')->getAttributes());
-	}
-
-
 	public function testCreateClientWithRedirectionUrisSucceedsAndReturnsClientEntity()
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);

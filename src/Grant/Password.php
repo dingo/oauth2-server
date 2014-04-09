@@ -31,7 +31,7 @@ class Password extends Grant {
 			throw new ClientException('user_authentication_failed', 'The user credentials failed to authenticate.', 400);
 		}
 
-		$client = $this->validateConfidentialClient();
+		$client = $this->strictlyValidateClient();
 
 		$scopes = $this->validateScopes();
 

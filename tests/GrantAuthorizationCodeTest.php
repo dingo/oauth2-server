@@ -51,39 +51,6 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		{
 			$this->assertEquals('The request is missing the "client_id" parameter.', $e->getMessage());
 		}
-
-		// Replace the query string parameters so that the missing parameter
-		// is the "redirect_uri".
-		$request->query->replace(['response_type' => 'code', 'client_id' => 'test']);
-
-		try
-		{
-			$grant->validateAuthorizationRequest();
-
-			$this->fail('Exception was not thrown when there is no "redirect_uri" parameter in query string.');
-		}
-		catch (Dingo\OAuth2\Exception\ClientException $e)
-		{
-			$this->assertEquals('The request is missing the "redirect_uri" parameter.', $e->getMessage());
-		}
-	}
-
-
-	/**
-	 * @expectedException \Dingo\OAuth2\Exception\ClientException
-	 * @expectedExceptionMessage The redirection URI is not registered to the client.
-	 */
-	public function testValidatingAuthorizationRequestFailsWhenPublicClientIsInvalid()
-	{
-		$grant = new AuthorizationCode;
-
-		$request = Request::create('test', 'GET', ['client_id' => 'test', 'response_type' => 'code', 'redirect_uri' => 'test']);
-
-		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
-
-		$storage->shouldReceive('get')->with('client')->andReturn(m::mock(['get' => false]));
-
-		$grant->validateAuthorizationRequest();
 	}
 
 
@@ -142,23 +109,8 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($this->getStorageMock());
 
 		// Replace the query string parameters so that the missing parameter
-		// is the "redirect_uri".
-		$request->query->replace(['code' => 'test']);
-
-		try
-		{
-			$grant->execute();
-
-			$this->fail('Exception was not thrown when there is no "redirect_uri" parameter in query string.');
-		}
-		catch (Dingo\OAuth2\Exception\ClientException $e)
-		{
-			$this->assertEquals('The request is missing the "redirect_uri" parameter.', $e->getMessage());
-		}
-
-		// Replace the query string parameters so that the missing parameter
 		// is the "code".
-		$request->query->replace(['redirect_uri' => 'test']);
+		$request->query->replace([]);
 
 		try
 		{

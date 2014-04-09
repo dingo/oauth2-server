@@ -86,7 +86,7 @@ class Client extends Redis implements ClientInterface {
 	 * @param  array  $redirectUris
 	 * @return \Dingo\OAuth2\Entity\Client|bool
 	 */
-	public function create($id, $secret, $name, $redirectUris = [])
+	public function create($id, $secret, $name, array $redirectUris)
 	{
 		$payload = [
 			'secret' => $secret,

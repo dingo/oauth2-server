@@ -103,7 +103,7 @@ class Client extends MySql implements ClientInterface {
 	 * @param  array  $redirectUris
 	 * @return \Dingo\OAuth2\Entity\Client|bool
 	 */
-	public function create($id, $secret, $name, $redirectUris = [])
+	public function create($id, $secret, $name, array $redirectUris)
 	{
 		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (id, secret, name) VALUES (:id, :secret, :name)', $this->tables['clients']));
 

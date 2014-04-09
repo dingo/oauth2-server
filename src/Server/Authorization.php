@@ -80,6 +80,13 @@ class Authorization {
 	protected $authorizedCallback;
 
 	/**
+	 * Authorization code entity when handling authorization requests.
+	 * 
+	 * @var \Dingo\OAuth2\Entity\AuthorizationCode
+	 */
+	protected $authorizationCode;
+
+	/**
 	 * Create a new Dingo\OAuth2\Server\Authorization instance.
 	 * 
 	 * @param  \Dingo\OAuth2\Storage\Adapter  $storage
@@ -288,9 +295,9 @@ class Authorization {
 	{
 		$key = $this->responseTypes[$this->request->get('response_type')];
 
-		$entity = $this->grants[$key]->handleAuthorizationRequest($clientId, $userId, $redirectUri, $scopes);
+		$code = $this->grants[$key]->handleAuthorizationRequest($clientId, $userId, $redirectUri, $scopes);
 
-		return $this->makeResponseFromEntity($entity);
+		return $this->makeResponseFromEntity($code);
 	}
 
 	/**
@@ -304,7 +311,17 @@ class Authorization {
 	{
 		$separator = $this->request->get('response_type') == 'code' ? '?' : '#';
 
-		return $this->request->get('redirect_uri').$separator.http_build_query($response);
+		if ( ! $redirectUri = $this->request->get('redirect_uri'))
+		{
+			$client = $this->storage->get('client')->get($this->request->get('client_id'));
+			
+			if ( ! $redirectUri = $client->getRedirectUri())
+			{
+				throw new RuntimeException('Client does not have any associated redirection URI.');
+			}
+		}
+
+		return $redirectUri.$separator.http_build_query($response);
 	}
 
 	/**

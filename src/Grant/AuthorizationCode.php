@@ -35,7 +35,7 @@ class AuthorizationCode extends ResponseGrant {
 	 */
 	public function execute()
 	{
-		$this->validateRequestParameters(['redirect_uri', 'code']);
+		$this->validateRequestParameters(['code']);
 
 		// Retrieve the code from the storage and perform some checks to ensure that
 		// the validated client above matches the client that the code was
@@ -46,16 +46,21 @@ class AuthorizationCode extends ResponseGrant {
 			throw new ClientException('unknown_authorization_code', 'The authorization code does not exist.', 400);
 		}
 
-		$client = $this->validateConfidentialClient();
+		$client = $this->strictlyValidateClient();
 
 		if ($code->getClientId() != $client->getId())
 		{
 			throw new ClientException('mismatched_client', 'The authorization code is not associated with the client.', 400);
 		}
 
-		if ($code->getRedirectUri() != $this->request->get('redirect_uri'))
+		if ($code->getRedirectUri())
 		{
-			throw new ClientException('mismatched_redirection_uri', 'The redirection URI does not match the redirection URI of the authorization code.', 400);
+			$redirectUri = $this->request->get('redirect_uri');
+
+			if ( ! $redirectUri or $redirectUri != $code->getRedirectUri())
+			{
+				throw new ClientException('mismatched_redirection_uri', 'The redirection URI does not match the redirection URI of the authorization code.', 400);
+			}
 		}
 
 		if ($code->getExpires() < time())

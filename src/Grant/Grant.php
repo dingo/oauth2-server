@@ -45,42 +45,26 @@ abstract class Grant implements GrantInterface {
 	protected $refreshTokenExpiration;
 
 	/**
-	 * Validate a confidential client by checking the client ID, secret, and any
-	 * redirection URI that was given.
+	 * Validate a client. If strictly validating an ID and secret are required.
 	 * 
+	 * @param  bool  $strict
 	 * @return \Dingo\OAuth2\Entity\Client
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */ 
-	protected function validateConfidentialClient()
+	protected function validateClient($strict = false)
 	{
 		// Grab the redirection URI from the post data if there is one. This is
 		// sent along when validating a client for some grant types. It doesn't
 		// matter if we send along a "null" value though.
 		$redirectUri = $this->request->get('redirect_uri');
+		
+		$id = $this->request->getUser() ?: $this->request->get('client_id');
 
-		$id = $secret = null;
-
-		// If the "Authorization" header exists within the request then we will
-		// attempt to pull the clients ID and secret from there.
-		if ($this->request->headers->has('authorization'))
-		{
-			$id = $this->request->getUser();
-
-			$secret = $this->request->getPassword();
-		}
-
-		// Otherwise we'll default to pulling the clients ID and secret from the
-		// requests post data. It's preferred if clients use HTTP basic.
-		if ( ! $id or ! $secret)
-		{
-			$id = $this->request->get('client_id');
-
-			$secret = $this->request->get('client_secret');
-		}
+		$secret = $this->request->getPassword() ?: $this->request->get('client_secret');
 
 		// If we have a client ID and secret we'll attempt to verify the client by
 		// grabbing its details from the storage adapter.
-		if (($id and $secret) and $client = $this->storage->get('client')->get($id, $secret, $redirectUri))
+		if (( ! $strict or ($strict and $id and $secret)) and $client = $this->storage->get('client')->get($id, $secret, $redirectUri))
 		{
 			return $client;
 		}
@@ -89,30 +73,15 @@ abstract class Grant implements GrantInterface {
 	}
 
 	/**
-	 * Validate a public client by checking the client ID and the
-	 * redirection URI.
+	 * Strictly validate a client.
 	 * 
+	 * @param  bool  $strict
 	 * @return \Dingo\OAuth2\Entity\Client
 	 * @throws \Dingo\OAuth2\Exception\ClientException
 	 */
-	public function validatePublicClient()
+	protected function strictlyValidateClient()
 	{
-		// When validating a public client the redirection URI is a required
-		// parameter. We will get the redirection URI and the clients ID
-		// from the request body to validate the public client.
-		$redirectUri = $this->request->get('redirect_uri');
-
-		$id = $this->request->get('client_id');
-
-		// When fetching the client from storage we pass "null" as the client
-		// secret because we want to match the redirection URI to the client
-		// ID to assert that the redirection URI is valid.
-		if ($client = $this->storage->get('client')->get($id, null, $redirectUri))
-		{
-			return $client;
-		}
-
-		throw new ClientException('client_authentication_failed', 'The redirection URI is not registered to the client.', 401);
+		return $this->validateClient(true);
 	}
 
 	/**

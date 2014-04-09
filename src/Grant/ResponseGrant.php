@@ -10,13 +10,21 @@ abstract class ResponseGrant extends Grant {
 	 */
 	public function validateAuthorizationRequest()
 	{
-		$this->validateRequestParameters(['response_type', 'client_id', 'redirect_uri']);
+		$this->validateRequestParameters(['response_type', 'client_id']);
 
-		$client = $this->validatePublicClient();
+		$client = $this->validateClient();
 
 		$scopes = $this->validateScopes();
 
-		$parameters = array_merge($this->request->query->all(), compact('scopes', 'client'));
+		$defaults = [
+			'client_id'    => $this->request->get('client_id'),
+			'user_id'      => $this->request->get('user_id'),
+			'redirect_uri' => $this->request->get('redirect_uri'),
+			'scopes'       => null,
+			'client'       => null
+		];
+
+		$parameters = array_merge($defaults, compact('scopes', 'client'));
 
 		return $parameters;
 	}

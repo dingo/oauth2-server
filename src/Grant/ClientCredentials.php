@@ -11,7 +11,7 @@ class ClientCredentials extends Grant {
 	 */
 	public function execute()
 	{
-		$client = $this->validateConfidentialClient();
+		$client = $this->strictlyValidateClient();
 
 		$scopes = $this->validateScopes();
 

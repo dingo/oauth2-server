@@ -192,6 +192,38 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testMakeRedirectUriWithoutRedirectUriInRequestAndNoDefaultRedirectUriThrowsException()
+	{
+		$storage = $this->getStorageMock();
+		$storage->shouldReceive('get')->once()->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test')
+		]));
+
+		$authorization = new Authorization($storage, Request::create('test', 'GET', ['response_type' => 'code']));
+
+		$authorization->makeRedirectUri(['code' => '12345']);
+	}
+
+
+	public function testMakeRedirectUriWithoutRedirectUriInRequestUsesDefaultRedirectUri()
+	{
+		$storage = $this->getStorageMock();
+		$storage->shouldReceive('get')->once()->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test', 'foo.com/bar')
+		]));
+
+		$authorization = new Authorization($storage, Request::create('test', 'GET', ['response_type' => 'code']));
+
+		$this->assertEquals('foo.com/bar?code=12345&scope=foo', $authorization->makeRedirectUri([
+			'code' => '12345',
+			'scope' => 'foo'
+		]));
+	}
+
+
 	public function testMakeRedirectUriWithQueryString()
 	{
 		$authorization = new Authorization($this->getStorageMock(), Request::create('test', 'GET', [

@@ -63,7 +63,7 @@ interface ClientInterface {
 	 * @param  array  $redirectUris
 	 * @return \Dingo\OAuth2\Entity\Client
 	 */
-	public function create($id, $secret, $name, $redirectUris = []);
+	public function create($id, $secret, $name, array $redirectUris);
 
 	/**
 	 * Delete a client and associated redirection URIs.

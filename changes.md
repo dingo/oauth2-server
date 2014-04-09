@@ -5,6 +5,7 @@
 - Throw more meaningful exception by including a generic error type.
 - Can now create and delete clients and scopes.
 - User defined authorized callback is now fired once an access token has been issued.
+- A "redirect_uri" parameter is now optional as per the spec when using the Authorization Code and Implicit grant types.
 
 ### 0.1.2 (April 8th, 2014)
 

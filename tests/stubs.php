@@ -1,9 +1,21 @@
 <?php
 
+class GrantStub extends Dingo\OAuth2\Grant\Grant {
 
-class RedisStub extends Dingo\OAuth2\Storage\Redis\Redis {
-	
+	public function execute()
+	{
+		return $this->strictlyValidateClient();
+	}
+
+	public function getGrantIdentifier()
+	{
+		return 'stub';
+	}
+
 }
+
+
+class RedisStub extends Dingo\OAuth2\Storage\Redis\Redis {}
 
 
 class PDOStub extends PDO {
@@ -29,6 +41,11 @@ class PasswordGrantStub extends Dingo\OAuth2\Grant\Grant {
 
 
 class AuthorizationCodeGrantStub extends Dingo\OAuth2\Grant\Grant {
+
+	public function execute()
+	{
+
+	}
 
 	public function validateAuthorizationRequest()
 	{
@@ -57,6 +74,11 @@ class AuthorizationCodeGrantStub extends Dingo\OAuth2\Grant\Grant {
 
 
 class RefreshGrantStub extends Dingo\OAuth2\Grant\Grant {
+
+	public function execute()
+	{
+		
+	}
 
 	public function generateToken()
 	{
@@ -97,6 +119,4 @@ class AdapterStub extends Dingo\OAuth2\Storage\Adapter {
 }
 
 
-class ScopeableEntityStub extends Dingo\OAuth2\Entity\ScopeableEntity {
-	
-}
+class ScopeableEntityStub extends Dingo\OAuth2\Entity\ScopeableEntity {}

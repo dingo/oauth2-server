@@ -9,4 +9,11 @@ interface GrantInterface {
 	 */
 	public function getGrantIdentifier();
 
+	/**
+	 * Execute the grant flow.
+	 * 
+	 * @return array
+	 */
+	public function execute();
+
 }
