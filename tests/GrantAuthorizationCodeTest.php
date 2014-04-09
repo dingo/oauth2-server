@@ -100,6 +100,28 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testHandlingAuthorizationRequestFiresAuthorizedCallback()
+	{
+		$grant = (new AuthorizationCode)->setStorage($storage = $this->getStorageMock());
+		$grant->setAuthorizedCallback(function($code, $client)
+		{
+			$this->assertInstanceOf('Dingo\OAuth2\Entity\AuthorizationCode', $code);
+			$this->assertInstanceOf('Dingo\OAuth2\Entity\Client', $client);
+		});
+
+		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([
+			'create' => new AuthorizationCodeEntity('test', 'test', 1, 'test', $expires = time() + 120),
+			'associateScopes' => true
+		]));
+
+		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test', 'test')
+		]));
+
+		$grant->handleAuthorizationRequest('test', 1, 'test', []);
+	}
+
+
 	public function testExecutingGrantFlowThrowsExceptionWhenMissingRequiredParameters()
 	{
 		$grant = new AuthorizationCode;

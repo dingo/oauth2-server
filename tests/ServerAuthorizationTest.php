@@ -115,27 +115,6 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testIssuingAccessTokenCallsAuthorizedCallback()
-	{
-		$storage = $this->getStorageMock();
-
-		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
-		]));
-
-		$authorization = new Authorization($storage, Request::create('testing', 'POST', ['grant_type' => 'password']));
-
-		$authorization->registerGrant(new PasswordGrantStub);
-		$authorization->setAuthorizedCallback(function($token, $client)
-		{
-			$this->assertInstanceOf('Dingo\OAuth2\Entity\Token', $token);
-			$this->assertInstanceOf('Dingo\OAuth2\Entity\Client', $client);
-		});
-
-		$token = $authorization->issueAccessToken();
-	}
-
-
 	/**
 	 * @expectedException \Dingo\OAuth2\Exception\ClientException
 	 */

@@ -73,20 +73,6 @@ class Authorization {
 	protected $responseTypes = [];
 
 	/**
-	 * Authorized callback used once access token is issued.
-	 * 
-	 * @var \Closure
-	 */
-	protected $authorizedCallback;
-
-	/**
-	 * Authorization code entity when handling authorization requests.
-	 * 
-	 * @var \Dingo\OAuth2\Entity\AuthorizationCode
-	 */
-	protected $authorizationCode;
-
-	/**
 	 * Create a new Dingo\OAuth2\Server\Authorization instance.
 	 * 
 	 * @param  \Dingo\OAuth2\Storage\Adapter  $storage
@@ -181,16 +167,6 @@ class Authorization {
 			$refreshToken = $this->issueRefreshToken($accessToken);
 
 			$response['refresh_token'] = $refreshToken->getToken();
-		}
-
-		// Fire the authorized callback that a developer can set. This is handy
-		// for developers that want to avoid prompting a user to authorize
-		// a client once they have already given the client permission.
-		if ($this->authorizedCallback instanceof Closure)
-		{
-			$client = $this->storage('client')->get($accessToken->getClientId());
-
-			call_user_func($this->authorizedCallback, $accessToken, $client);
 		}
 
 		// When making a response from an entity we may get some optional
@@ -353,19 +329,6 @@ class Authorization {
 	public function getRequest()
 	{
 		return $this->request;
-	}
-
-	/**
-	 * Set the authorized callback.
-	 * 
-	 * @param  \Closure  $callback
-	 * @return \Dingo\OAuth2\Server\Authorization
-	 */
-	public function setAuthorizedCallback(Closure $callback)
-	{
-		$this->authorizedCallback = $callback;
-
-		return $this;
 	}
 
 	/**

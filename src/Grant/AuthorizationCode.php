@@ -1,8 +1,16 @@
 <?php namespace Dingo\OAuth2\Grant;
 
+use Closure;
 use Dingo\OAuth2\Exception\ClientException;
 
 class AuthorizationCode extends ResponseGrant {
+
+	/**
+	 * Authorized callback used once access token is issued.
+	 * 
+	 * @var \Closure
+	 */
+	protected $authorizedCallback;
 
 	/**
 	 * Handle the authorization request by creating an authorization code.
@@ -22,6 +30,21 @@ class AuthorizationCode extends ResponseGrant {
 		$code = $this->storage('authorization')->create($this->generateToken(), $clientId, $userId, $redirectUri, $expires);
 
 		$this->storage('authorization')->associateScopes($code->getCode(), $scopes);
+
+		$code->attachScopes($scopes);
+
+		// If we have an authorized callback set by the developer we'll fire it
+		// now. This is handy when developers want to avoid prompting a user
+		// to authorize a client that they've authorized in the past.
+		if ($this->authorizedCallback instanceof Closure)
+		{
+			// Before we fire the authorized callback we'll pull the client from
+			// storage again so we can hand that off to the callback along
+			// with the code entity.
+			$client = $this->storage('client')->get($clientId);
+
+			call_user_func($this->authorizedCallback, $code, $client);
+		}
 
 		return $code;
 	}
@@ -95,6 +118,19 @@ class AuthorizationCode extends ResponseGrant {
 	public function getGrantIdentifier()
 	{
 		return 'authorization_code';
+	}
+
+	/**
+	 * Set the authorized callback.
+	 * 
+	 * @param  \Closure  $callback
+	 * @return \Dingo\OAuth2\Server\Authorization
+	 */
+	public function setAuthorizedCallback(Closure $callback)
+	{
+		$this->authorizedCallback = $callback;
+
+		return $this;
 	}
 
 }
