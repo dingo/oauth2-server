@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `oauth_authorization_codes` (
   `code` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `client_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `user_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `redirect_uri` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `redirect_uri` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `expires` datetime NOT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
