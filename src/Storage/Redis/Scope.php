@@ -9,7 +9,7 @@ class Scope extends Redis implements ScopeInterface {
 	 * Get a scope from storage.
 	 * 
 	 * @param  string  $scope
-	 * @return \Dingo\OAuth2\Entity\Scope|false
+	 * @return \Dingo\OAuth2\Entity\Scope|bool
 	 */
 	public function get($scope)
 	{
@@ -19,6 +19,49 @@ class Scope extends Redis implements ScopeInterface {
 		}
 
 		return new ScopeEntity($scope, $value['name'], $value['description']);
+	}
+
+	/**
+	 * Insert a scope into storage.
+	 * 
+	 * @param  string  $scope
+	 * @param  string  $name
+	 * @param  string  $description
+	 * @return \Dingo\OAuth2\Entity\Scope|bool
+	 */
+	public function create($scope, $name, $description)
+	{
+		$payload = [
+			'name' => $name,
+			'description' => $description
+		];
+
+		if ( ! $this->setValue($scope, $this->tables['scopes'], $payload))
+		{
+			return false;
+		}
+
+		if ( ! $this->pushSet(null, $this->tables['scopes'], $scope))
+		{
+			$this->delete($scope);
+
+			return false;
+		}
+
+		return new ScopeEntity($scope, $name, $description);
+	}
+
+	/**
+	 * Delete a scope from storage.
+	 * 
+	 * @param  string  $scope
+	 * @return void
+	 */
+	public function delete($scope)
+	{
+		$this->deleteKey($scope, $this->tables['scopes']);
+
+		$this->deleteSet(null, $this->tables['scopes'], $scope);
 	}
 
 }
