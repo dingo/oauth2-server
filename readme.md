@@ -109,17 +109,32 @@ Before we continue you should be aware of what the following terms mean.
 
 ### Creating Clients
 
-This package does not create or modify clients. The implementation for creating clients is in your own hands. When testing it's often easy to just insert a record into your MySQL table. For the rest of the guide it will be assumed that you have a client with the following details.
+The package is capable of creating clients, however, no user interface is provided with the package. To create a client you'll need a storage adapter instance.
 
-| Key           | Value     |
-| ------------- | --------- |
-| Client ID     | example   |
-| Client Secret | topsecret |
-| Client Name   | Example   |
+```php
+$storage = new Dingo\OAuth2\Storage\MySqlAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
+```
 
-Our client will also have a single associated endpoint: `http://localhost/example-client/authenticate`
+You can now get the client storage and create a new client.
 
-This is the URI the Authorization Server will redirect the user to once they have authenticated and given the client permission.
+```php
+$storage->get('client')->create('id', 'secret', 'name', [['uri' => 'http://example.com/code', 'default' => true]]);
+```
+
+A client is expected to have at least ONE associated endpoint and it should be defined as the default endpoint. Clients can have multiple endpoints for testing or staging servers.
+
+```php
+$storage->get('client')->create('id', 'secret', 'name', [
+	['uri' => 'http://example.com/code', 'default' => true],
+	['uri' => 'http://staging.example.com/code', 'default' => false]
+]);
+```
+
+For the rest of the guide it will be assumed that you have created a client similar to the following.
+
+```php
+$storage->get('client')->create('id', 'secret', 'name', [['uri' => 'http://localhost/example-client/auth/code', 'default' => true]]);
+```
 
 ### Authorization Server
 
@@ -145,7 +160,8 @@ We'll now need a route that will handle the attempted authorization. This guide 
 <?php
 // If the user is not logged in we'll redirect them to the login form
 // with the query string that was sent with the initial request.
-if ( ! isset($_SESSION['user']))
+// The login form is not within the scope of this guide.
+if ( ! isset($_SESSION['user_id']))
 {
 	header("Location: /login?{$_SERVER['QUERY_STRING']}");
 }
@@ -164,7 +180,7 @@ else
 
 	if (isset($_POST['submit']))
 	{
-		$response = $server->handleAuthorizationRequest($payload['client_id'], $payload['user_id'], $payload['redirect_uri'], $payload['scopes']);
+		$response = $server->handleAuthorizationRequest($payload['client_id'], $_SESSION['user_id'], $payload['redirect_uri'], $payload['scopes']);
 
 		header("Location: {$server->makeRedirectUri($response)}");
 	}
@@ -204,12 +220,12 @@ The client can now prompt a user to authorize via OAuth 2.0 by directing the use
 http://localhost/example-server/authorize
 	?response_type=code
 	&client_id=example
-	&redirect_uri=http%3A%2F%2Flocalhost%2Fexample-client%2Fauthenticate
+	&redirect_uri=http%3A%2F%2Flocalhost%2Fexample-client%2Fauth%2Fcode
 ```
 
 If the Authorization Server detects that the user is not logged in they will be redirected to the login page and requested to login. Once logged in the user should be redirected back where they are prompted to authorize the client. If the user authorizes the client the Authorization Server will issue an authorization code which is sent back as part of the query string on the redirect URI that was provided. 
 
-> Remember that the redirection URI provided must match a redirection URI that was registered for the client.
+> Remember that if a redirection URI is provided it must match a redirection URI that was registered for the client. When no redirection URI is provided the default redirection URI is used.
 
 Now that the client has the authorization code it needs to request an access token from the Authorization Server using the code. We'll need a route that will handle the issuing of access tokens. This guide will assume the route is at `http://localhost/example-server/token`.
 
