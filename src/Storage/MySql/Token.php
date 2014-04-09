@@ -62,6 +62,11 @@ class Token extends MySql implements TokenInterface {
 	 */
 	public function get($token)
 	{
+		if (isset($this->cache[$token]))
+		{
+			return $this->cache[$token];
+		}
+
 		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s
 			WHERE token = :token', $this->tables['tokens']));
 
@@ -70,9 +75,7 @@ class Token extends MySql implements TokenInterface {
 			return false;
 		}
 
-		$token = new TokenEntity($token['token'], $token['type'], $token['client_id'], $token['user_id'], strtotime($token['expires']));
-
-		return $token;
+		return $this->cache[$token['token']] = new TokenEntity($token['token'], $token['type'], $token['client_id'], $token['user_id'], strtotime($token['expires']));
 	}
 
 	/**
@@ -106,7 +109,7 @@ class Token extends MySql implements TokenInterface {
 			$token->attachScopes($scopes);
 		}
 
-		return $token;
+		return $this->cache[$token->getToken()] = $token;
 	}
 
 	/**
@@ -117,6 +120,8 @@ class Token extends MySql implements TokenInterface {
 	 */
 	public function delete($token)
 	{
+		unset($this->cache[$token]);
+
 		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE token = :token;
 			DELETE FROM %2$s WHERE token = :token', $this->tables['tokens'], $this->tables['token_scopes']));
 

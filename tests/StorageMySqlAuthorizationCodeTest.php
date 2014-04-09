@@ -119,6 +119,40 @@ class StorageMySqlAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetAuthorizationCodePullsFromCacheOnSecondCall()
+	{
+		$storage = new AuthorizationCodeStorage($this->pdo, [
+			'authorization_codes' => 'authorization_codes',
+			'scopes' => 'scopes',
+			'authorization_code_scopes' => 'authorization_code_scopes'
+		]);
+
+		$this->pdo->expects($this->at(0))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
+			'code' => 'test',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'redirect_uri' => 'test',
+			'expires' => '1991-01-31 12:00:00'
+		]));
+
+		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(false));
+
+		$storage->get('test');
+
+		$this->assertEquals([
+			'code' => 'test',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'redirect_uri' => 'test',
+			'scopes' => [],
+			'expires' => strtotime('1991-01-31 12:00:00')
+		], $storage->get('test')->getAttributes());
+	}
+
+
 	public function testDeleteAuthorizationCode()
 	{
 		$storage = new AuthorizationCodeStorage($this->pdo, [

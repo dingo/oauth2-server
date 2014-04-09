@@ -62,6 +62,11 @@ class AuthorizationCode extends MySql implements AuthorizationCodeInterface {
 	 */
 	public function get($code)
 	{
+		if (isset($this->cache[$code]))
+		{
+			return $this->cache[$code];
+		}
+
 		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s
 			WHERE code = :code', $this->tables['authorization_codes']));
 
@@ -90,7 +95,7 @@ class AuthorizationCode extends MySql implements AuthorizationCodeInterface {
 			$code->attachScopes($scopes);
 		}
 
-		return $code;
+		return $this->cache[$code->getCode()] = $code;
 	}
 
 	/**
@@ -101,6 +106,8 @@ class AuthorizationCode extends MySql implements AuthorizationCodeInterface {
 	 */
 	public function delete($code)
 	{
+		unset($this->cache[$code]);
+		
 		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE code = :code;
 			DELETE FROM %2$s WHERE code = :code', $this->tables['authorization_codes'], $this->tables['authorization_code_scopes']));
 

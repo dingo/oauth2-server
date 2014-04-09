@@ -19,6 +19,13 @@ abstract class MySql {
 	protected $tables;
 
 	/**
+	 * Cached queries and the results.
+	 * 
+	 * @var array
+	 */
+	protected $cache = [];
+
+	/**
 	 * Create a new Dingo\OAuth2\Storage\MySql\MySql instance.
 	 * 
 	 * @param  \PDO  $connection

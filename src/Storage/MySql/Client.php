@@ -15,6 +15,11 @@ class Client extends MySql implements ClientInterface {
 	 */
 	public function get($id, $secret = null, $redirectUri = null)
 	{
+		if (isset($this->cache[$id]))
+		{
+			return $this->cache[$id];
+		}
+
 		// Prepare the default bindings that will be used for a fully constructed
 		// PDO statement.
 		$bindings = [
@@ -91,7 +96,7 @@ class Client extends MySql implements ClientInterface {
 			}
 		}
 
-		return new ClientEntity($client['id'], $client['secret'], $client['name'], $client['redirect_uri']);
+		return $this->cache[$client['id']] = new ClientEntity($client['id'], $client['secret'], $client['name'], $client['redirect_uri']);
 	}
 
 	/**
@@ -147,6 +152,8 @@ class Client extends MySql implements ClientInterface {
 	 */
 	public function delete($id)
 	{
+		unset($this->cache[$id]);
+		
 		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE %1$s.id = :id; 
 			DELETE FROM %2$s WHERE %2$s.client_id = :id', $this->tables['clients'], $this->tables['client_endpoints']));
 

@@ -55,6 +55,32 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetClientByIdPullsFromCacheOnSecondCall()
+	{
+		$storage = new ClientStorage($this->pdo, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->pdo->expects($this->at(0))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test'
+		]));
+
+		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(false));
+
+		$storage->get('test');
+
+		$this->assertEquals([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test',
+			'redirect_uri' => null
+		], $storage->get('test')->getAttributes());
+	}
+
+
 	public function testGetClientByIdSucceedsAndRedirectionUriIsFound()
 	{
 		$storage = new ClientStorage($this->pdo, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);

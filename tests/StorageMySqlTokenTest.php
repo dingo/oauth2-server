@@ -97,6 +97,33 @@ class StorageMySqlTokenTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testGetTokenEntityPullsFromCacheOnSecondCall()
+	{
+		$storage = new TokenStorage($this->pdo, ['tokens' => 'tokens']);
+
+		$this->pdo->expects($this->once())->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
+			'token' => 'test',
+			'type' => 'access',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'expires' => '1991-01-31 12:00:00'
+		]));
+
+		$storage->get('test');
+
+		$this->assertEquals([
+			'token' => 'test',
+			'type' => 'access',
+			'client_id' => 'test',
+			'user_id' => 1,
+			'scopes' => [],
+			'expires' => strtotime('1991-01-31 12:00:00')
+		], $storage->get('test')->getAttributes());
+	}
+
+
 	public function testGetTokenWithScopesFailsAndReturnsFalse()
 	{
 		$storage = new TokenStorage($this->pdo, ['tokens' => 'tokens']);

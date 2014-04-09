@@ -13,6 +13,11 @@ class Scope extends MySql implements ScopeInterface {
 	 */
 	public function get($scope)
 	{
+		if (isset($this->cache[$scope]))
+		{
+			return $this->cache[$scope];
+		}
+
 		$query = $this->connection->prepare(sprintf('SELECT * FROM %1$s WHERE %1$s.scope = :scope', $this->tables['scopes']));
 
 		if ( ! $query->execute([':scope' => $scope]) or ! $scope = $query->fetch())
@@ -20,7 +25,7 @@ class Scope extends MySql implements ScopeInterface {
 			return false;
 		}
 
-		return new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
+		return $this->cache[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
 	}
 
 	/**
@@ -56,6 +61,8 @@ class Scope extends MySql implements ScopeInterface {
 	 */
 	public function delete($scope)
 	{
+		unset($this->cache[$scope]);
+		
 		$query = $this->connection->prepare(sprintf('DELETE FROM %1$s WHERE scope = :scope', $this->tables['scopes']));
 
 		$query->execute([':scope' => $scope]);
