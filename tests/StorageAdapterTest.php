@@ -25,4 +25,14 @@ class StorageAdapterTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSettingTablesMergesWithExisting()
+	{
+		$storage = new AdapterStub;
+
+		$storage->setTables(['clients' => 'foo']);
+
+		$this->assertEquals('foo', $storage->getTables()['clients']);
+	}
+
+
 }

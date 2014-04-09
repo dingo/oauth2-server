@@ -53,7 +53,7 @@ interface AuthorizationCodeInterface {
 	 * WHERE oauth_authorization_code_scopes.code = :code
 	 * 
 	 * @param  string  $code
-	 * @return \Dingo\OAuth2\Entity\AuthorizationCode
+	 * @return \Dingo\OAuth2\Entity\AuthorizationCode|bool
 	 */
 	public function get($code);
 

@@ -30,10 +30,7 @@ class AuthorizationCode extends MySql implements AuthorizationCodeInterface {
 			':expires'      => date('Y-m-d H:i:s', $expires)
 		];
 
-		if ( ! $query->execute($bindings))
-		{
-			return false;
-		}
+		$query->execute($bindings);
 
 		return new AuthorizationCodeEntity($code, $clientId, $userId, $redirectUri, $expires);
 	}

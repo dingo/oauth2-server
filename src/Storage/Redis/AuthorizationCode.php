@@ -25,19 +25,11 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 			'expires'      => $expires
 		];
 
-		if ( ! $this->setValue($code, $this->tables['authorization_codes'], $payload))
-		{
-			return false;
-		}
+		$this->setValue($code, $this->tables['authorization_codes'], $payload);
 
-		// We'll also store the authorization code in a "authorization codes"
-		// set so we can easily flush all authorization codes if need be.
-		if ( ! $this->pushSet(null, $this->tables['authorization_codes'], $code))
-		{
-			$this->delete($code);
-			
-			return false;
-		}
+		// Push the authorization code onto the authorization codes set so that
+		// we can easily manage all authorization codes with Redis.
+		$this->pushSet(null, $this->tables['authorization_codes'], $code);
 
 		return new AuthorizationCodeEntity($code, $clientId, $userId, $redirectUri, $expires);
 	}
@@ -78,6 +70,8 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 
 		$scopes = [];
 
+		// Get the authorization code scopes set and spin through each scope
+		// on the set and create a scope entity.
 		foreach ($this->getSet($code->getCode(), $this->tables['authorization_code_scopes']) as $scope)
 		{
 			$scopes[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
@@ -97,6 +91,8 @@ class AuthorizationCode extends Redis implements AuthorizationCodeInterface {
 	public function delete($code)
 	{
 		$this->deleteKey($code, $this->tables['authorization_codes']);
+
+		$this->deleteSet(null, $this->tables['authorization_codes'], $code);
 
 		$this->deleteKey($code, $this->tables['authorization_code_scopes']);
 	}

@@ -47,4 +47,30 @@ class StorageMySqlScopeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCreatingScopeSucceedsAndReturnsScopeEntity()
+	{
+		$storage = new ScopeStorage($this->pdo, ['scopes' => 'scopes']);
+
+		$this->pdo->expects($this->once())->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+
+		$this->assertEquals([
+			'scope' => 'test',
+			'name' => 'test',
+			'description' => 'test'
+		], $storage->create('test', 'test', 'test')->getAttributes());
+	}
+
+
+	public function testDeletingScope()
+	{
+		$storage = new ScopeStorage($this->pdo, ['scopes' => 'scopes']);
+
+		$this->pdo->expects($this->once())->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+
+		$storage->delete('test');
+	}
+
+
 }

@@ -77,4 +77,15 @@ class StorageRedisRedisTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testDeletingSetValueAlsoUnsetsCachedValue()
+	{
+		$this->redis->shouldReceive('sadd')->once()->with('test:foo', 'bar')->andReturn(true);
+		$this->redis->shouldReceive('srem')->once()->with('test:foo', 'bar')->andReturn(true);
+
+		$this->storage->pushSet('foo', 'test', 'bar');
+
+		$this->assertTrue($this->storage->deleteSet('foo', 'test', 'bar'));
+	}
+
+
 }

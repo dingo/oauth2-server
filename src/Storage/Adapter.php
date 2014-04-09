@@ -102,4 +102,14 @@ abstract class Adapter {
 		return $this;
 	}
 
+	/**
+	 * Get the tables to be used by storages.
+	 * 
+	 * @return array
+	 */
+	public function getTables()
+	{
+		return $this->tables;
+	}
+
 }

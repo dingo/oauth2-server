@@ -78,7 +78,7 @@ class Client extends Redis implements ClientInterface {
 	}
 
 	/**
-	 * Create a client and associated redirection URIs.
+	 * Insert a client and associated redirection URIs into storage.
 	 * 
 	 * @param  string  $id
 	 * @param  string  $secret
@@ -93,36 +93,27 @@ class Client extends Redis implements ClientInterface {
 			'name' => $name
 		];
 
-		if ( ! $this->setValue($id, $this->tables['clients'], $payload))
-		{
-			return false;
-		}
+		$this->setValue($id, $this->tables['clients'], $payload);
 
-		if ( ! $this->pushSet(null, $this->tables['clients'], $id))
-		{
-			$this->delete($id);
-
-			return false;
-		}
+		// Push the clients ID onto the clients set so that we can easily manage all
+		// clients with Redis.
+		$this->pushSet(null, $this->tables['clients'], $id);
 
 		$redirectUri = null;
 
-		if ( ! empty($redirectUris))
+		foreach ($redirectUris as $uri)
 		{
-			foreach ($redirectUris as $uri)
+			// If this redirection URI is the default then we'll set our redirection URI
+			// to this URI for when we return the client entity.
+			if ($uri['default'])
 			{
-				// If this redirection URI is the default then we'll set our redirection URI
-				// to this URI for when we return the client entity.
-				if ($uri['default'])
-				{
-					$redirectUri = $uri['uri'];
-				}
-
-				$this->pushSet($id, $this->tables['client_endpoints'], [
-					'uri' => $uri['uri'],
-					'is_default' => (int) $uri['default']
-				]);
+				$redirectUri = $uri['uri'];
 			}
+
+			$this->pushSet($id, $this->tables['client_endpoints'], [
+				'uri' => $uri['uri'],
+				'is_default' => $uri['default']
+			]);
 		}
 
 		return new ClientEntity($id, $secret, $name, $redirectUri);

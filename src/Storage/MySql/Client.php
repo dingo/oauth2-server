@@ -113,33 +113,27 @@ class Client extends MySql implements ClientInterface {
 			':name'   => $name
 		];
 
-		if ( ! $query->execute($bindings))
-		{
-			return false;
-		}
+		$query->execute($bindings);
 
 		$redirectUri = null;
 
-		if ( ! empty($redirectUris))
+		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (client_id, uri, is_default) 
+			VALUES (:client_id, :uri, :is_default)', $this->tables['client_endpoints']));
+
+		foreach ($redirectUris as $uri)
 		{
-			$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (client_id, uri, is_default) 
-				VALUES (:client_id, :uri, :is_default)', $this->tables['client_endpoints']));
-
-			foreach ($redirectUris as $uri)
+			// If this redirection URI is the default then we'll set our redirection URI
+			// to this URI for when we return the client entity.
+			if ($uri['default'])
 			{
-				// If this redirection URI is the default then we'll set our redirection URI
-				// to this URI for when we return the client entity.
-				if ($uri['default'])
-				{
-					$redirectUri = $uri['uri'];
-				}
-
-				$query->execute([
-					':client_id' => $id,
-					':uri' => $uri['uri'],
-					':is_default' => (int) $uri['default']
-				]);
+				$redirectUri = $uri['uri'];
 			}
+
+			$query->execute([
+				':client_id' => $id,
+				':uri' => $uri['uri'],
+				':is_default' => (int) $uri['default']
+			]);
 		}
 
 		return new ClientEntity($id, $secret, $name, $redirectUri);

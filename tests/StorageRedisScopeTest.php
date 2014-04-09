@@ -43,5 +43,31 @@ class StorageRedisScopeTest extends PHPUnit_Framework_TestCase {
 		], $scope->getAttributes());
 	}
 
+
+	public function testCreateScopeSucceedsAndReturnsScopeEntity()
+	{
+		$storage = new ScopeStorage($this->redis, ['scopes' => 'scopes']);
+
+		$this->redis->shouldReceive('set')->once()->with('scopes:test', '{"name":"test","description":"test"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('scopes', 'test')->andReturn(true);
+
+		$this->assertEquals([
+			'scope' => 'test',
+			'name' => 'test',
+			'description' => 'test'
+		], $storage->create('test', 'test', 'test')->getAttributes());
+	}
+
+
+	public function testDeletingScope()
+	{
+		$storage = new ScopeStorage($this->redis, ['scopes' => 'scopes']);
+
+		$this->redis->shouldReceive('del')->once()->with('scopes:test');
+		$this->redis->shouldReceive('srem')->once()->with('scopes', 'test');
+
+		$storage->delete('test');
+	}
+
 	
 }

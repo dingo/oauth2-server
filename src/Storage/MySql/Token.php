@@ -30,10 +30,7 @@ class Token extends MySql implements TokenInterface {
 			':expires'   => date('Y-m-d H:i:s', $expires)
 		];
 
-		if ( ! $query->execute($bindings))
-		{
-			return false;
-		}
+		$query->execute($bindings);
 
 		return new TokenEntity($token, $type, $clientId, $userId, $expires);
 	}

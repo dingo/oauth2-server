@@ -25,19 +25,11 @@ class Token extends Redis implements TokenInterface {
 			'expires'   => $expires
 		];
 		
-		if ( ! $this->setValue($token, $this->tables['tokens'], $payload))
-		{
-			return false;
-		}
+		$this->setValue($token, $this->tables['tokens'], $payload);
 
-		// We'll also store the token in a "tokens" set so we can easily
-		// flush all tokens if need be.
-		if ( ! $this->pushSet(null, $this->tables['tokens'], $token))
-		{
-			$this->delete($token);
-
-			return false;
-		}
+		// Push the token onto the tokens set so that we can easily manage all
+		// tokens with Redis.
+		$this->pushSet(null, $this->tables['tokens'], $token);
 
 		return new TokenEntity($token, $type, $clientId, $userId, $expires);
 	}
@@ -92,6 +84,8 @@ class Token extends Redis implements TokenInterface {
 
 		$scopes = [];
 
+		// Get the token scopes set and spin through each scope on the set
+		// and create a scope entity.
 		foreach ($this->getSet($token->getToken(), $this->tables['token_scopes']) as $scope)
 		{
 			$scopes[$scope['scope']] = new ScopeEntity($scope['scope'], $scope['name'], $scope['description']);
@@ -111,6 +105,8 @@ class Token extends Redis implements TokenInterface {
 	public function delete($token)
 	{
 		$this->deleteKey($token, $this->tables['tokens']);
+
+		$this->deleteSet(null, $this->tables['tokens'], $token);
 
 		$this->deleteKey($token, $this->tables['token_scopes']);
 	}

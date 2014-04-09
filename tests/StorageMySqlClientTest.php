@@ -158,4 +158,52 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testCreateClientSucceedsAndReturnsClientEntity()
+	{
+		$storage = new ClientStorage($this->pdo, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->pdo->expects($this->at(0))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+
+		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($this->getMock('PDOStatement')));
+
+		$this->assertEquals([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test',
+			'redirect_uri' => null
+		], $storage->create('test', 'test', 'test')->getAttributes());
+	}
+
+
+	public function testCreateClientWithRedirectionUrisSucceedsAndReturnsClientEntity()
+	{
+		$storage = new ClientStorage($this->pdo, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->pdo->expects($this->at(0))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+
+		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->any())->method('execute')->will($this->returnValue(true));
+
+		$this->assertEquals([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test',
+			'redirect_uri' => 'foo'
+		], $storage->create('test', 'test', 'test', [['uri' => 'foo', 'default' => true],['uri' => 'bar', 'default' => false]])->getAttributes());
+	}
+
+
+	public function testDeletingClient()
+	{
+		$storage = new ClientStorage($this->pdo, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->pdo->expects($this->once())->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
+		$statement->expects($this->once())->method('execute')->will($this->returnValue(true));
+
+		$storage->delete('test');
+	}
+
+
 }

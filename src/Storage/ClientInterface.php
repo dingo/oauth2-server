@@ -40,7 +40,7 @@ interface ClientInterface {
 	 * @param  string  $id
 	 * @param  string  $secret
 	 * @param  string  $redirectUri
-	 * @return \Dingo\OAuth2\Entity\Client|false
+	 * @return \Dingo\OAuth2\Entity\Client|bool
 	 */
 	public function get($id, $secret = null, $redirectUri = null);
 
@@ -61,7 +61,7 @@ interface ClientInterface {
 	 * @param  string  $secret
 	 * @param  string  $name
 	 * @param  array  $redirectUris
-	 * @return \Dingo\OAuth2\Entity\Client|bool
+	 * @return \Dingo\OAuth2\Entity\Client
 	 */
 	public function create($id, $secret, $name, $redirectUris = []);
 

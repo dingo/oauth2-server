@@ -43,10 +43,7 @@ class Scope extends MySql implements ScopeInterface {
 			':description' => $description,
 		];
 
-		if ( ! $query->execute($bindings))
-		{
-			return false;
-		}
+		$query->execute($bindings);
 
 		return new ScopeEntity($scope, $name, $description);
 	}

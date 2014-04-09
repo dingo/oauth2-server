@@ -25,7 +25,7 @@ interface ScopeInterface {
 	 * @param  string  $scope
 	 * @param  string  $name
 	 * @param  string  $description
-	 * @return \Dingo\OAuth2\Entity\Scope|bool
+	 * @return \Dingo\OAuth2\Entity\Scope
 	 */
 	public function create($scope, $name, $description);
 

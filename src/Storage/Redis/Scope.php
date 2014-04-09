@@ -36,17 +36,11 @@ class Scope extends Redis implements ScopeInterface {
 			'description' => $description
 		];
 
-		if ( ! $this->setValue($scope, $this->tables['scopes'], $payload))
-		{
-			return false;
-		}
+		$this->setValue($scope, $this->tables['scopes'], $payload);
 
-		if ( ! $this->pushSet(null, $this->tables['scopes'], $scope))
-		{
-			$this->delete($scope);
-
-			return false;
-		}
+		// Push the scope onto the scopes set so that we can easily manage all
+		// scopes with Redis.
+		$this->pushSet(null, $this->tables['scopes'], $scope);
 
 		return new ScopeEntity($scope, $name, $description);
 	}

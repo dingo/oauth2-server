@@ -153,7 +153,7 @@ abstract class Redis {
 	{
 		$key = $this->prefix($key, $table);
 
-		if (isset($this->cache[$key]) and $cacheKey = array_search($this->cache[$key], $value))
+		if (isset($this->cache[$key]) and ($cacheKey = array_search($value, $this->cache[$key])) !== false)
 		{
 			unset($this->cache[$key][$cacheKey]);
 		}

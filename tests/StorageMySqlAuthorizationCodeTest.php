@@ -19,23 +19,6 @@ class StorageMySqlAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCreateAuthorizationCodeEntityFailsAndReturnsFalse()
-	{
-		$storage = new AuthorizationCodeStorage($this->pdo, ['authorization_codes' => 'authorization_codes']);
-
-		$this->pdo->expects($this->once())->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
-		$statement->expects($this->once())->method('execute')->with([
-			':code' => 'test',
-			':client_id' => 'test',
-			':user_id' => 1,
-			':redirect_uri' => 'test',
-			':expires' => '1991-01-31 12:00:00'
-		])->will($this->returnValue(false));
-
-		$this->assertFalse($storage->create('test', 'test', 1, 'test', strtotime('31 January 1991 12:00:00')));
-	}
-
-
 	public function testCreateAuthorizationCodeEntitySucceedsAndReturnsAuthorizationCodeEntity()
 	{
 		$storage = new AuthorizationCodeStorage($this->pdo, ['authorization_codes' => 'authorization_codes']);

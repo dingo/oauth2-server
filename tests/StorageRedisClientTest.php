@@ -160,6 +160,52 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'redirect_uri' => 'test'
 		], $client->getAttributes());
 	}
+
+
+	public function testCreateClientSucceedsAndReturnsClientEntity()
+	{
+		$storage = new ClientStorage($this->redis, ['clients' => 'clients']);
+
+		$this->redis->shouldReceive('set')->once()->with('clients:test', '{"secret":"test","name":"test"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('clients', 'test')->andReturn(true);
+
+		$this->assertEquals([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test',
+			'redirect_uri' => null
+		], $storage->create('test', 'test', 'test')->getAttributes());
+	}
+
+
+	public function testCreateClientWithRedirectionUrisSucceedsAndReturnsClientEntity()
+	{
+		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->redis->shouldReceive('set')->once()->with('clients:test', '{"secret":"test","name":"test"}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('clients', 'test')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('client:endpoints:test', '{"uri":"foo","is_default":true}')->andReturn(true);
+		$this->redis->shouldReceive('sadd')->once()->with('client:endpoints:test', '{"uri":"bar","is_default":false}')->andReturn(true);
+
+		$this->assertEquals([
+			'id' => 'test',
+			'secret' => 'test',
+			'name' => 'test',
+			'redirect_uri' => 'foo'
+		], $storage->create('test', 'test', 'test', [['uri' => 'foo', 'default' => true],['uri' => 'bar', 'default' => false]])->getAttributes());
+	}
+
+
+	public function testDeletingClient()
+	{
+		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
+
+		$this->redis->shouldReceive('del')->once()->with('clients:test')->andReturn(true);
+		$this->redis->shouldReceive('srem')->once()->with('clients', 'test')->andReturn(true);
+		$this->redis->shouldReceive('del')->once()->with('client:endpoints:test')->andReturn(true);
+
+		$storage->delete('test');
+	}
 	
 	
 }
