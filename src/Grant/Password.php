@@ -22,8 +22,6 @@ class Password extends Grant {
 	 */
 	public function execute()
 	{
-		$requestData = $this->request->request;
-
 		list ($username, $password) = $this->validateRequestParameters(['username', 'password']);
 
 		if ( ! $userId = call_user_func($this->authenticationCallback, $username, $password))
