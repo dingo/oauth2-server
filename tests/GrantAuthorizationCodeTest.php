@@ -115,7 +115,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		]));
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false, 'test')
 		]));
 
 		$grant->handleAuthorizationRequest('test', 1, 'test', []);
@@ -188,7 +188,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('foo', 'foo', 'foo')
+			'get' => new ClientEntity('foo', 'foo', 'foo', false)
 		]));
 
 		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([
@@ -217,7 +217,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false)
 		]));
 
 		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([
@@ -246,7 +246,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false)
 		]));
 
 		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([
@@ -271,7 +271,7 @@ class GrantAuthorizationCodeTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false)
 		]));
 
 		$storage->shouldReceive('get')->with('authorization')->andReturn(m::mock([

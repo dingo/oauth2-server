@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `oauth_clients` (
   `id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `secret` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `trusted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -130,6 +131,12 @@ $storage->get('client')->create('id', 'secret', 'name', [
 	['uri' => 'http://example.com/code', 'default' => true],
 	['uri' => 'http://staging.example.com/code', 'default' => false]
 ]);
+```
+
+A client can be set as "trusted", meaning you can perform a quick check before authorizing and if the client is marked as "trusted" then it will be automatically authorized. The fifth parameter must be set to `true` to mark the client as "trusted".
+
+```php
+$storage->get('client')->create('id', 'secret', 'name', [['uri' => 'http://example.com/code', 'default' => true]], true);
 ```
 
 You can also delete a client. This will also delete an associated endpoints.
@@ -210,7 +217,7 @@ else
 		exit;
 	}
 
-	if (isset($_POST['submit']))
+	if (isset($_POST['submit']) or $payload['client']->isTrusted())
 	{
 		$response = $server->handleAuthorizationRequest($payload['client_id'], $_SESSION['user_id'], $payload['redirect_uri'], $payload['scopes']);
 
@@ -255,7 +262,7 @@ http://localhost/example-server/authorize
 	&redirect_uri=http%3A%2F%2Flocalhost%2Fexample-client%2Fauth%2Fcode
 ```
 
-If the Authorization Server detects that the user is not logged in they will be redirected to the login page and requested to login. Once logged in the user should be redirected back where they are prompted to authorize the client. If the user authorizes the client the Authorization Server will issue an authorization code which is sent back as part of the query string on the redirect URI that was provided. 
+If the Authorization Server detects that the user is not logged in they will be redirected to the login page and requested to login. Once logged in the user should be redirected back where they are prompted to authorize the client unless the client has been marked as "trusted". If the user authorizes the client the Authorization Server will issue an authorization code which is sent back as part of the query string on the redirect URI that was provided. 
 
 > Remember that if a redirection URI is provided it must match a redirection URI that was registered for the client. When no redirection URI is provided the default redirection URI is used.
 

@@ -96,7 +96,9 @@ class Client extends MySql implements ClientInterface {
 			}
 		}
 
-		return $this->cache[$client['id']] = new ClientEntity($client['id'], $client['secret'], $client['name'], $client['redirect_uri']);
+		$client = new ClientEntity($client['id'], $client['secret'], $client['name'], (bool) $client['trusted'], $client['redirect_uri']);
+
+		return $this->cache[$client->getId()] = $client;
 	}
 
 	/**
@@ -106,16 +108,19 @@ class Client extends MySql implements ClientInterface {
 	 * @param  string  $secret
 	 * @param  string  $name
 	 * @param  array  $redirectUris
+	 * @param  bool  $trusted
 	 * @return \Dingo\OAuth2\Entity\Client|bool
 	 */
-	public function create($id, $secret, $name, array $redirectUris)
+	public function create($id, $secret, $name, array $redirectUris, $trusted = false)
 	{
-		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (id, secret, name) VALUES (:id, :secret, :name)', $this->tables['clients']));
+		$query = $this->connection->prepare(sprintf('INSERT INTO %1$s (id, secret, name, trusted) 
+			VALUES (:id, :secret, :name, :trusted)', $this->tables['clients']));
 
 		$bindings = [
-			':id'     => $id,
-			':secret' => $secret,
-			':name'   => $name
+			':id'      => $id,
+			':secret'  => $secret,
+			':name'    => $name,
+			':trusted' => (int) $trusted
 		];
 
 		$query->execute($bindings);
@@ -141,7 +146,7 @@ class Client extends MySql implements ClientInterface {
 			]);
 		}
 
-		return new ClientEntity($id, $secret, $name, $redirectUri);
+		return new ClientEntity($id, $secret, $name, (bool) $trusted, $redirectUri);
 	}
 
 	/**

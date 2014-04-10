@@ -38,7 +38,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
 			'id' => 'test',
 			'secret' => 'test',
-			'name' => 'test'
+			'name' => 'test',
+			'trusted' => false
 		]));
 
 		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
@@ -50,7 +51,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -64,7 +66,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
 			'id' => 'test',
 			'secret' => 'test',
-			'name' => 'test'
+			'name' => 'test',
+			'trusted' => false
 		]));
 
 		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
@@ -76,7 +79,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $storage->get('test')->getAttributes());
 	}
 
@@ -90,7 +94,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
 			'id' => 'test',
 			'secret' => 'test',
-			'name' => 'test'
+			'name' => 'test',
+			'trusted' => false
 		]));
 
 		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
@@ -105,7 +110,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -120,7 +126,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		]));
 
 		$client = $storage->get('test', null, 'test');
@@ -129,7 +136,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -143,7 +151,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 		$statement->expects($this->once())->method('fetch')->will($this->returnValue([
 			'id' => 'test',
 			'secret' => 'test',
-			'name' => 'test'
+			'name' => 'test',
+			'trusted' => false
 		]));
 
 		$this->pdo->expects($this->at(1))->method('prepare')->will($this->returnValue($statement = $this->getMock('PDOStatement')));
@@ -155,7 +164,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -170,7 +180,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		]));
 
 		$client = $storage->get('test', 'test', 'test');
@@ -179,7 +190,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -198,7 +210,8 @@ class StorageMySqlClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'foo'
+			'redirect_uri' => 'foo',
+			'trusted' => false
 		], $storage->create('test', 'test', 'test', [['uri' => 'foo', 'default' => true],['uri' => 'bar', 'default' => false]])->getAttributes());
 	}
 

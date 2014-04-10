@@ -23,13 +23,14 @@ class GrantGrantTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->once()->with('client')->andReturn($client = m::mock('Dingo\OAuth2\Storage\ClientInterface'));
-		$client->shouldReceive('get')->once()->with('test', 'test', null)->andReturn(new ClientEntity('test', 'test', 'test'));
+		$client->shouldReceive('get')->once()->with('test', 'test', null)->andReturn(new ClientEntity('test', 'test', 'test', false));
 
 		$this->assertEquals([
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $grant->execute()->getAttributes());
 	}
 
@@ -43,13 +44,14 @@ class GrantGrantTest extends PHPUnit_Framework_TestCase {
 		$grant->setRequest($request) and $grant->setStorage($storage = $this->getStorageMock());
 
 		$storage->shouldReceive('get')->once()->with('client')->andReturn($client = m::mock('Dingo\OAuth2\Storage\ClientInterface'));
-		$client->shouldReceive('get')->once()->with('test', 'test', null)->andReturn(new ClientEntity('test', 'test', 'test'));
+		$client->shouldReceive('get')->once()->with('test', 'test', null)->andReturn(new ClientEntity('test', 'test', 'test', false));
 
 		$this->assertEquals([
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $grant->execute()->getAttributes());
 	}
 

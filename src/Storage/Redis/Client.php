@@ -74,7 +74,7 @@ class Client extends Redis implements ClientInterface {
 			});
 		}
 
-		return new ClientEntity($id, $client['secret'], $client['name'], $client['redirect_uri']);
+		return new ClientEntity($id, $client['secret'], $client['name'], (bool) $client['trusted'], $client['redirect_uri']);
 	}
 
 	/**
@@ -84,13 +84,15 @@ class Client extends Redis implements ClientInterface {
 	 * @param  string  $secret
 	 * @param  string  $name
 	 * @param  array  $redirectUris
+	 * @param  bool  $trusted
 	 * @return \Dingo\OAuth2\Entity\Client|bool
 	 */
-	public function create($id, $secret, $name, array $redirectUris)
+	public function create($id, $secret, $name, array $redirectUris, $trusted = false)
 	{
 		$payload = [
 			'secret' => $secret,
-			'name' => $name
+			'name' => $name,
+			'trusted' => (bool) $trusted
 		];
 
 		$this->setValue($id, $this->tables['clients'], $payload);
@@ -116,7 +118,7 @@ class Client extends Redis implements ClientInterface {
 			]);
 		}
 
-		return new ClientEntity($id, $secret, $name, $redirectUri);
+		return new ClientEntity($id, $secret, $name, (bool) $trusted, $redirectUri);
 	}
 
 	/**

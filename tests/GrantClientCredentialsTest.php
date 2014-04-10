@@ -28,7 +28,7 @@ class GrantClientCredentialsTest extends PHPUnit_Framework_TestCase {
 		$validator->shouldReceive('validate')->once()->andReturn(['test' => true]);
 
 		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false)
 		]));
 
 		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([

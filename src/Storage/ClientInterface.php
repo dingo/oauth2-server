@@ -49,8 +49,8 @@ interface ClientInterface {
 	 * 
 	 * Example MySQL query to create client:
 	 * 
-	 * INSERT INTO oauth_clients (id, secret, name) 
-	 * VALUES (:id, :secret, :name)
+	 * INSERT INTO oauth_clients (id, secret, name, trusted) 
+	 * VALUES (:id, :secret, :name, :trusted)
 	 * 
 	 * Example MySQL query to create associated redirection URIs:
 	 * 
@@ -61,9 +61,10 @@ interface ClientInterface {
 	 * @param  string  $secret
 	 * @param  string  $name
 	 * @param  array  $redirectUris
+	 * @param  bool  $trusted
 	 * @return \Dingo\OAuth2\Entity\Client
 	 */
-	public function create($id, $secret, $name, array $redirectUris);
+	public function create($id, $secret, $name, array $redirectUris, $trusted = false);
 
 	/**
 	 * Delete a client and associated redirection URIs.

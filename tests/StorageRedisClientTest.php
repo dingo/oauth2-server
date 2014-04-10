@@ -33,7 +33,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->once()->with('client:endpoints:test')->andReturn([
 			'{"uri":"bar","is_default":false}'
 		]);
@@ -46,7 +46,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->once()->with('client:endpoints:test')->andReturn([]);
 
 		$this->assertFalse($storage->get('test', 'bad'));
@@ -57,7 +57,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->once()->with('client:endpoints:test')->andReturn([
 			'{"uri":"bar","is_default":false}'
 		]);
@@ -70,7 +70,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->twice()->with('client:endpoints:test')->andReturn([]);
 
 		$client = $storage->get('test');
@@ -79,7 +79,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -88,7 +89,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->twice()->with('client:endpoints:test')->andReturn([
 			'{"uri":"test","is_default":true}'
 		]);
@@ -99,7 +100,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -108,7 +110,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->once()->with('client:endpoints:test')->andReturn([
 			'{"uri":"test","is_default":false}'
 		]);
@@ -119,7 +121,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -128,7 +131,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->twice()->with('client:endpoints:test')->andReturn([]);
 
 		$client = $storage->get('test', 'test');
@@ -137,7 +140,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => null
+			'redirect_uri' => null,
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -146,7 +150,7 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = new ClientStorage($this->redis, ['clients' => 'clients', 'client_endpoints' => 'client_endpoints']);
 
-		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test"}');
+		$this->redis->shouldReceive('get')->once()->with('clients:test')->andReturn('{"secret":"test","name":"test","trusted":false}');
 		$this->redis->shouldReceive('smembers')->once()->with('client:endpoints:test')->andReturn([
 			'{"uri":"test","is_default":false}'
 		]);
@@ -157,7 +161,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'test'
+			'redirect_uri' => 'test',
+			'trusted' => false
 		], $client->getAttributes());
 	}
 
@@ -175,7 +180,8 @@ class StorageRedisClientTest extends PHPUnit_Framework_TestCase {
 			'id' => 'test',
 			'secret' => 'test',
 			'name' => 'test',
-			'redirect_uri' => 'foo'
+			'redirect_uri' => 'foo',
+			'trusted' => false
 		], $storage->create('test', 'test', 'test', [['uri' => 'foo', 'default' => true],['uri' => 'bar', 'default' => false]])->getAttributes());
 	}
 

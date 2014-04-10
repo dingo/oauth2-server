@@ -178,7 +178,7 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = $this->getStorageMock();
 		$storage->shouldReceive('get')->once()->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test')
+			'get' => new ClientEntity('test', 'test', 'test', false)
 		]));
 
 		$authorization = new Authorization($storage, Request::create('test', 'GET', ['response_type' => 'code']));
@@ -191,7 +191,7 @@ class ServerAuthorizationTest extends PHPUnit_Framework_TestCase {
 	{
 		$storage = $this->getStorageMock();
 		$storage->shouldReceive('get')->once()->with('client')->andReturn(m::mock([
-			'get' => new ClientEntity('test', 'test', 'test', 'foo.com/bar')
+			'get' => new ClientEntity('test', 'test', 'test', false, 'foo.com/bar')
 		]));
 
 		$authorization = new Authorization($storage, Request::create('test', 'GET', ['response_type' => 'code']));

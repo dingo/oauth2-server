@@ -3,6 +3,7 @@
 ### 0.1.4
 
 - Fixed bug where refresh token entity JSON was inserted into `oauth_token_scopes` table instead of the actual token.
+- Clients can be marked as trusted for automatic authorization.
 
 ### 0.1.3 (April 10th, 2014)
 
