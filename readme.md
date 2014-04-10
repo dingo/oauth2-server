@@ -107,7 +107,9 @@ Before we continue you should be aware of what the following terms mean.
 | **Client**      | An application, e.g., a PHP web application.               |
 | **User**        | The applications user, also known as the *resource owner*. |
 
-### Creating Clients
+### Clients
+
+In OAuth 2.0 a client is an application that acts on behalf of a user and talks to the Authorization and Resource servers.
 
 The package is capable of creating clients, however, no user interface is provided with the package. To create a client you'll need a storage adapter instance.
 
@@ -130,11 +132,41 @@ $storage->get('client')->create('id', 'secret', 'name', [
 ]);
 ```
 
+You can also delete a client. This will also delete an associated endpoints.
+
+```php
+$storage->get('client')->delete('id');
+```
+
 For the rest of the guide it will be assumed that you have created a client similar to the following.
 
 ```php
 $storage->get('client')->create('id', 'secret', 'name', [['uri' => 'http://localhost/example-client/auth/code', 'default' => true]]);
 ```
+
+### Scopes
+
+When a client requests a users authorization the client will often request specific permissions, these permissions are refered to as a **scope**. A scope defines what the client has permission to see or do. Essentially they provide developers with even finer control over what a client can access.
+
+The package is capable of creating scopes, however, no user interface is provided with the package. To create a scope you'll need a storage adapter instance.
+
+```php
+$storage = new Dingo\OAuth2\Storage\MySqlAdapter(new PDO('mysql:host=localhost;dbname=oauth', 'root'));
+```
+
+You can now get the scope storage and create a new scope.
+
+```php
+$storage->get('scope')->create('scope', 'name', 'description');
+```
+
+You can also delete a scope.
+
+```php
+$storage->get('scope')->delete('scope');
+```
+
+This guide will not utilize scopes, however, feel free to create and use them.
 
 ### Authorization Server
 
