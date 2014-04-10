@@ -193,7 +193,7 @@ class Authorization {
 
 		$refreshToken = $this->storage('token')->create($refreshToken, 'refresh', $accessToken->getClientId(), $accessToken->getUserId(), $expires);
 
-		$this->storage('token')->associateScopes($refreshToken, $accessToken->getScopes());
+		$this->storage('token')->associateScopes($refreshToken->getToken(), $accessToken->getScopes());
 
 		return $refreshToken;
 	}

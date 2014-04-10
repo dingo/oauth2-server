@@ -1,5 +1,9 @@
 ## Changes
 
+### 0.1.4
+
+- Fixed bug where refresh token entity JSON was inserted into `oauth_token_scopes` table instead of the actual token.
+
 ### 0.1.3 (April 10th, 2014)
 
 - Throw more meaningful exception by including a generic error type.
