@@ -15,7 +15,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	public function testCanGetAccessTokenFromHeaders()
+	public function testCanFindAccessTokenFromHeaders()
 	{
 		$request = Request::create('foo', 'POST');
 		$request->headers->set('authorization', 'Bearer 12345');
@@ -24,11 +24,11 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$this->assertEquals('12345', $resource->getAccessToken());
+		$this->assertEquals('12345', $resource->findAccessToken());
 	}
 
 
-	public function testCanGetAccessTokenFromPostRequestBody()
+	public function testCanFindAccessTokenFromPostRequestBody()
 	{
 		$request = Request::create('foo', 'POST', ['access_token' => '12345']);
 
@@ -36,11 +36,11 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$this->assertEquals('12345', $resource->getAccessToken());
+		$this->assertEquals('12345', $resource->findAccessToken());
 	}
 
 
-	public function testCanGetAccessTokenFromGetQueryParameters()
+	public function testCanFindAccessTokenFromGetQueryParameters()
 	{
 		$request = Request::create('foo', 'GET', ['access_token' => '12345']);
 
@@ -48,11 +48,11 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$this->assertEquals('12345', $resource->getAccessToken());
+		$this->assertEquals('12345', $resource->findAccessToken());
 	}
 
 
-	public function testGettingAccessTokenReturnsFalseWhenTokenNotFound()
+	public function testFindingAccessTokenReturnsFalseWhenTokenNotFound()
 	{
 		$request = Request::create('foo', 'GET');
 
@@ -60,11 +60,11 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$this->assertFalse($resource->getAccessToken());
+		$this->assertFalse($resource->findAccessToken());
 	}
 
 
-	public function testGettingAccessTokenReturnsFalseWhenTokenNotFoundInAuthorizationHeader()
+	public function testFindingAccessTokenReturnsFalseWhenTokenNotFoundInAuthorizationHeader()
 	{
 		$request = Request::create('foo', 'GET');
 
@@ -74,7 +74,7 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = new Resource($storage, $request);
 
-		$this->assertFalse($resource->getAccessToken());
+		$this->assertFalse($resource->findAccessToken());
 	}
 
 
@@ -185,7 +185,9 @@ class ServerResourceTest extends PHPUnit_Framework_TestCase {
 
 		$resource = (new Resource($storage, $request))->setDefaultScopes(['foo']);
 
-		$token = $resource->validateRequest();
+		$resource->validateRequest();
+
+		$token = $resource->getToken();
 
 		$this->assertEquals(12345, $token->getToken());
 	}

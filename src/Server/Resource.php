@@ -29,6 +29,13 @@ class Resource {
 	protected $defaultScopes = [];
 
 	/**
+	 * Authenticated access token.
+	 * 
+	 * @var \Dingo\OAuth2\Entity\Token
+	 */
+	protected $token;
+
+	/**
 	 * Create a new Dingo\OAuth2\Server\Resource instance.
 	 * 
 	 * @param  \Dingo\OAuth2\Storage\Adapter  $storage
@@ -50,7 +57,7 @@ class Resource {
 	 */
 	public function validateRequest($scopes = null)
 	{
-		if ( ! $token = $this->getAccessToken())
+		if ( ! $token = $this->findAccessToken())
 		{
 			throw new InvalidTokenException('missing_parameter', 'Access token was not supplied.', 401);
 		}
@@ -69,7 +76,7 @@ class Resource {
 
 		$this->validateTokenScopes($token, $scopes);
 
-		return $token;
+		return $this->token = $token;
 	}
 
 	/**
@@ -104,15 +111,14 @@ class Resource {
 				throw new InvalidTokenException('mismatched_scope', 'Requested scope "'.$scope.'" is not associated with this access token.', 401);
 			}
 		}
-		
 	}
 
 	/**
-	 * Get the access token from either the header or request body.
+	 * Find the access token in either the header or request body.
 	 * 
 	 * @return bool|string
 	 */
-	public function getAccessToken()
+	public function findAccessToken()
 	{
 		if ($header = $this->request->headers->get('authorization'))
 		{
@@ -129,6 +135,16 @@ class Resource {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the authenticated access token.
+	 * 
+	 * @return \Dingo\OAuth2\Entity\Token
+	 */
+	public function getToken()
+	{
+		return $this->token;
 	}
 
 	/**
