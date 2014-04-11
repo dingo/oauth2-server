@@ -1,6 +1,6 @@
 ## Changes
 
-### 0.1.4
+### 0.2.0 (April 11th, 2014)
 
 - Fixed bug where refresh token entity JSON was inserted into `oauth_token_scopes` table instead of the actual token.
 - Clients can be marked as trusted for automatic authorization.
