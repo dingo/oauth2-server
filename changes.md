@@ -1,5 +1,9 @@
 ## Changes
 
+### 0.2.1 (April 21st, 2014)
+
+- Changing test bootstrapping.
+
 ### 0.2.0 (April 11th, 2014)
 
 - Fixed bug where refresh token entity JSON was inserted into `oauth_token_scopes` table instead of the actual token.
