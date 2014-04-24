@@ -384,9 +384,9 @@ The following tables describes the error types and the reason as to why this err
 | unknown_response_type         | The supplied response type has not been registered on the server.   |
 | unknown_token                 | The supplied token does not exist.                                  |
 | expired_token                 | The supplied token has expired.                                     |
+| mismatched_client             | The client is not associated with the token orauthorization code.   |
 | unknown_authorization_code    | The supplied authorization code does not exist.                     |
 | expired_authorization_code    | The supplied authorization code has expired.                        |
-| mismatched_client             | The client is not associated with the authorization code.           |
 | mismatched_redirectection_uri | The redirection URIs do not match.                                  |
 | client_authentication_failed  | The client failed to authenticate.                                  |
 | user_authentication_failed    | The user failed to authenticate.                                    |

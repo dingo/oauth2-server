@@ -32,6 +32,58 @@ class GrantRefreshTokenTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 * @expectedException \Dingo\OAuth2\Exception\ClientException
+	 */
+	public function testExceutingGrantFlowFailsWhenUnknownTokenAndThrowsException()
+	{
+		$grant = (new RefreshToken)
+			->setRequest(Request::create('test', 'GET', [
+				'refresh_token' => 'test',
+				'client_id' => 'test',
+				'client_secret' => 'test'
+			]))
+			->setStorage($storage = $this->getStorageMock())
+			->setScopeValidator($validator = m::mock('Dingo\OAuth2\ScopeValidator'));
+
+		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test', false)
+		]));
+
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
+			'getWithScopes' => null
+		]));
+
+		$grant->execute();
+	}
+
+
+	/**
+	 * @expectedException \Dingo\OAuth2\Exception\ClientException
+	 */
+	public function testExceutingGrantFlowFailsWhenClientIdsDoNotMatchAndThrowsException()
+	{
+		$grant = (new RefreshToken)
+			->setRequest(Request::create('test', 'GET', [
+				'refresh_token' => 'test',
+				'client_id' => 'test',
+				'client_secret' => 'test'
+			]))
+			->setStorage($storage = $this->getStorageMock())
+			->setScopeValidator($validator = m::mock('Dingo\OAuth2\ScopeValidator'));
+
+		$storage->shouldReceive('get')->with('client')->andReturn(m::mock([
+			'get' => new ClientEntity('test', 'test', 'test', false)
+		]));
+
+		$storage->shouldReceive('get')->with('token')->andReturn(m::mock([
+			'getWithScopes' => new TokenEntity('test', 'refresh', 'foo', 1, $expires = time() + 120)
+		]));
+
+		$grant->execute();
+	}
+
+
 	public function testExecutingGrantFlowSucceedsAndReturnsValidToken()
 	{
 		$grant = (new RefreshToken)

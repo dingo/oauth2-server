@@ -1,5 +1,10 @@
 ## Changes
 
+### 0.2.2 (April 24th, 2014)
+
+- Refresh token now issued when requesting new access token via Refresh Token Grant.
+- Client is now validated against the existing refresh token when using the Refresh Token Grant.
+
 ### 0.2.1 (April 21st, 2014)
 
 - Changing test bootstrapping.

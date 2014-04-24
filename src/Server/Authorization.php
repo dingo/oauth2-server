@@ -162,7 +162,7 @@ class Authorization {
 
 		// If the "refresh" grant has been registered we'll issue a refresh token
 		// so that clients can easily renew their access tokens.
-		if (isset($this->grants['refresh_token']) and in_array($grant, $this->refreshEnabledGrants))
+		if (isset($this->grants['refresh_token']) and (in_array($grant, $this->refreshEnabledGrants) or $grant == 'refresh_token'))
 		{
 			$refreshToken = $this->issueRefreshToken($accessToken);
 

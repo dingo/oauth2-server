@@ -1,5 +1,7 @@
 <?php namespace Dingo\OAuth2\Grant;
 
+use Dingo\OAuth2\Exception\ClientException;
+
 class RefreshToken extends Grant {
 
 	/**
@@ -15,7 +17,15 @@ class RefreshToken extends Grant {
 
 		$client = $this->strictlyValidateClient();
 
-		$oldToken = $this->storage('token')->getWithScopes($token);
+		if ( ! $oldToken = $this->storage('token')->getWithScopes($token))
+		{
+			throw new ClientException('unknown_token', 'Invalid refresh token.', 400);
+		}
+
+		if ($client->getId() != $oldToken->getClientId())
+		{
+			throw new ClientException('mismatched_client', 'The refresh token is not associated with the client.', 400);
+		}
 
 		$scopes = $this->validateScopes($oldToken->getScopes());
 
